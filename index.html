@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title></title>
+  <link rel="shortcut icon" href="" type="png">
+  <link rel="stylesheet" href="./assets/css/style.css">
+  <link rel="stylesheet" href="./assets/css/slider.css">
+  <link rel="stylesheet" href="./assets/css/bimPN.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap">
+</head>
+<body>
+  <main class="cont">
+    <article class="pushN">
+      <section class="alert">
+        <h3>Alert</h3>
+        <div>
+          <pre class="alertCode code">
+            <button onclick="runCode('alert')"><img src="./assets/images/svg/play.svg" alt="run-code"></button>
+<code><span class="dblue">bimPN</span>.<span class="yellow">alert</span><span class="dyellow">(</span><span class="purple">{</span>
+  <span class="lblue">title:</span> <span class="orange">'Lorem, ipsum!'</span>,
+  <span class="lblue">text:</span> <span class="orange">'Lorem, ipsum dolor.'</span>,<span class="pasteicon"><br>  <span class="lblue">icon:</span> <span class="orange">'check'</span>,</span><span class="pastelocation"><br>  <span class="lblue">location:</span> <span class="orange">'top-left'</span>,</span><span class="pasteanimate"><br>  <span class="lblue">animate:</span> <span class="dblue">true</span>,</span><span class="pasteautoClose"><br>  <span class="lblue">autoClose:</span> <span class="dblue">true</span>,</span>
+  <span class="lblue">timer:</span> <span class="mint">2000</span>,
+<span class="purple">}</span><span class="dyellow">)</span>;</code>
+          </pre>
+          <div class="buttonLists">
+            <div class="property">
+              <p>location</p>
+              <ul class="locationValue" data-radioBtns>
+                <li class="selected"><button>top-left</button></li>
+                <li><button>bottom-left</button></li>
+                <li><button>top-right</button></li>
+                <li><button>bottom-right</button></li>
+                <li><button>center</button></li>
+              </ul>
+            </div>
+            <div class="property">
+              <p>icon</p>
+              <ul class="locationValue" data-radioBtns>
+                <li class="selected"><button>check</button></li>
+                <li><button>info</button></li>
+                <li><button>warning</button></li>
+                <li><button>error</button></li>
+                <li><button>question</button></li>
+              </ul>
+            </div>
+            <div class="property">
+              <p>animate</p>
+              <ul class="locationValue" data-radioBtns>
+                <li class="selected"><button>true</button></li>
+                <li><button>false</button></li>
+              </ul>
+            </div>
+            <div class="property">
+              <p>autoClose</p>
+              <ul class="locationValue" data-radioBtns>
+                <li class="selected"><button>true</button></li>
+                <li><button>false</button></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+      <section class="input">
+        <h3>Input</h3>
+        <div>
+          <pre class="inputCode code">
+            <button onclick="runCode('input')"><img src="./assets/images/svg/play.svg" alt="run-code"></button>
+<code><span class="dblue">bimPN</span>.<span class="yellow">input</span><span class="dyellow">(</span><span class="purple">{</span>
+  <span class="lblue">title:</span> <span class="orange">'Input!'</span>,
+  <span class="lblue">text:</span> <span class="orange">'input a value.'</span>,<span class="pastetype"><br>  <span class="lblue">type:</span> <span class="orange">'text'</span>,</span>
+  <span class="lblue">placeholder:</span> <span class="orange">'placeholder'</span>,
+<span class="purple">}</span><span class="dyellow">)</span>
+.<span class="yellow">then</span><span class="dyellow">(</span><span class="purple">(</span><span class="lblue">res</span><span class="purple">)</span> <span class="dblue pasteautoClose">=></span> <span class="purple">{</span>
+  <span class="lblue">console</span>.<span class="yellow">log</span><span class="dblue">(</span><span class="lblue">res</span><span class="dblue">)</span>;
+<span class="purple">}</span><span class="dyellow">)</span>;</code>
+          </pre>
+          <div class="property">
+            <p>type</p>
+            <ul class="inputValue" data-radioBtns>
+              <li class="selected"><button>text</button></li>
+              <li><button>number</button></li>
+              <li><button>email</button></li>
+              <li><button>option</button></li>
+            </ul>
+          </div>
+        </div>
+      </section>
+      <section class="confirm">
+        <h3>Confirmation</h3>
+        <div>
+          <pre class="confirmCode code">
+            <button onclick="runCode('confirm')"><img src="./assets/images/svg/play.svg" alt="run-code"></button>
+<code><span class="dblue">bimPN</span>.<span class="yellow">confirm</span><span class="dyellow">(</span><span class="purple">{</span>
+  <span class="lblue">title:</span> <span class="orange">'Delete Data'</span>,
+  <span class="lblue">text:</span> <span class="orange">'Do you want to delete?'</span>,
+  <span class="lblue">icon:</span> <span class="orange">'warning'</span>,
+  <span class="lblue">confirmButtonText:</span> <span class="orange">'Yes'</span>,
+  <span class="lblue">cancelButtonText:</span> <span class="orange">'No'</span>,
+<span class="purple">}</span><span class="dyellow">)</span>
+.<span class="yellow">then</span><span class="dyellow">(</span><span class="purple">(</span><span class="lblue">res</span><span class="purple">)</span> <span class="dblue pasteautoClose">=></span> <span class="purple">{</span>
+  <span class="lblue">console</span>.<span class="yellow">log</span><span class="dblue">(</span><span class="lblue">res</span><span class="dblue">)</span>;
+  <span class="purple">if</span><span class="dblue">(</span><span class="lblue">res</span>.<span class="lblue">isConfirmed</span><span class="dblue">){</span>
+    <span class="dblue">bimPN</span>.<span class="yellow">alert</span><span class="dyellow">(</span><span class="purple">{</span>
+      <span class="lblue">title:</span> <span class="orange">'Success!'</span>,
+      <span class="lblue">text:</span> <span class="orange">'Data deleted'</span>,
+      <span class="lblue">icon:</span> <span class="orange">'check'</span>,
+      <span class="lblue">location:</span> <span class="orange">'center'</span>,
+    <span class="purple">}</span><span class="dyellow">)</span>;
+  <span class="blue">}</span>
+  <span class="purple">else</span><span class="dblue">{</span>
+    <span class="dblue">bimPN</span>.<span class="yellow">alert</span><span class="dyellow">(</span><span class="purple">{</span>
+      <span class="lblue">title:</span> <span class="orange">'Cancelled'</span>,
+      <span class="lblue">text:</span> <span class="orange">'Data retained'</span>,
+      <span class="lblue">location:</span> <span class="orange">'center'</span>,
+    <span class="purple">}</span><span class="dyellow">)</span>;
+  <span class="dblue">}</span>
+<span class="purple">}</span><span class="dyellow">)</span>;</code>
+          </pre>
+        </div>
+      </section>
+    </article>
+    <article class="cardSlider">
+      <ul class="cardList">
+        <li>1</li>
+        <li>2</li>
+        <li>3</li>
+        <li>4</li>
+        <li>5</li>
+        <li>6</li>
+        <li>7</li>
+      </ul>
+    </article>
+    <ul id="breadcrumbs-list"></ul>
+    <div class="productSelector">
+      <div id="variantSelector">
+        <div>
+          <p data-varSelPrice></p>
+          <p data-varSelStock></p>
+        </div>
+      </div>
+      <button data-addToCart>Add to Cart</button>
+    </div>
+  </main>
+  <script src="./assets/js/filter.js"></script>
+  <script src="./assets/js/breadcrumbs.js"></script>
+  <script src="./assets/js/slider.js"></script>
+  <script src="./assets/js/template.js"></script>
+  <script src="./assets/js/varSel.js"></script>
+  <script src="./assets/js/modals.js"></script>
+  <script src="./assets/js/script.js"></script>
+</body>
+</html>
