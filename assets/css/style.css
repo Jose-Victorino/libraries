@@ -199,6 +199,19 @@ code span{
   width: 100%;
 }
 
+.imgViewer{
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+  gap: 10px;
+}
+.imgViewer li{
+  display: flex;
+}
+.imgViewer img{
+  object-fit: cover;
+  width: 100%;
+  aspect-ratio: 3 / 2;
+}
 
 #variantSelector{
   display: flex;

@@ -279,7 +279,7 @@ class slider{
     const pressEnd = () => {
       velocity = 0;
 
-      if(isDragging){
+      if(isDragging && dragVal){
         let translatedNum = [], closestCard;
 
         switch(this.#data.type){
@@ -364,8 +364,9 @@ class slider{
       if(this.#data.pagination) updatePagination();
     };
     const paginationUpdatePosition = (e) => {
-      const target = e.target.closest('li');
-      if(!target) return;
+      const target = e.target.closest('li[data-li-page]');
+      if(!target || target.dataset.currentPage === 'true') return;
+      
       currentSlide = Array.from(this.#pages).indexOf(target) + 1;
       
       switch(this.#data.type){
