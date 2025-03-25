@@ -147,11 +147,14 @@ input:focus, textarea:focus{ border: 1px solid hsl(0, 0%, 65%); }
   padding: 15px;
   border-radius: 7px;
 }
+.pushN pre.toastCode{
+  height: calc(6lh + 2 * 15px);
+}
 .pushN pre.alertCode{
-  height: calc(9lh + 2 * 15px);
+  height: calc(8lh + 2 * 15px);
 }
 .pushN pre.inputCode{
-  height: calc(9lh + 2 * 15px);
+  height: calc(10lh + 2 * 15px);
 }
 .pushN pre.confirmCode{
   height: calc(25lh + 2 * 15px);

@@ -9,12 +9,27 @@ const bimPN = (() => {
   /**
    * @typedef {'text' | 'number' | 'email' | 'option'} Type
    * @typedef {'check' | 'info' | 'warning' | 'error' | 'question'} Icon
-   * @typedef {'top-left' | 'bottom-left' | 'top-right' | 'bottom-right' | 'center'} Locations
-   * @typedef {'alert' | 'input' | 'confirm'} ModalType
+   * @typedef {'top-left' | 'top-middle' | 'top-right' | 'bottom-left' | 'bottom-middle' | 'bottom-right'} Locations
+   * @typedef {'toast' | 'alert' | 'input' | 'confirm'} ModalType
    * 
    * @typedef {Object} Results
    * @property {Boolean} isConfirmed - User confirmed input
    * @property {Boolean} isCancelled - User cancelled input
+   * 
+   * @typedef {Object} modalHTMLElements 
+   * @property {HTMLDivElement} divPN 
+   * @property {HTMLElement} article 
+   * @property {HTMLElement} content 
+   * @property {HTMLDivElement} info 
+   * @property {HTMLImageElement} centerImg 
+   * @property {HTMLHeadingElement} titleH1 
+   * @property {HTMLParagraphElement} textP 
+   * @property {HTMLInputElement} inputTag 
+   * @property {HTMLSelectElement} selectTag 
+   * @property {HTMLSpanElement} span 
+   * @property {HTMLDivElement} btnCont 
+   * @property {HTMLButtonElement} confirm 
+   * @property {HTMLButtonElement} cancel
    */
   /**
    * @param {Number} ms 
@@ -23,28 +38,37 @@ const bimPN = (() => {
   const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
   /**
    * @param {ModalType} modalType 
-   * @param {ModalData} data 
+   * @param {ModalData | String} data 
+   * @returns {ModalData}
    */
   const setDefaultValues = (modalType, data) => {
-    data.modalType = modalType;
-    switch(modalType){
-      case 'alert':
-        data.location ??= 'top-left';
-        data.animate ??= true;
-        data.autoClose ??= true;
-        data.timer = (data.timer ?? 2000) + 200;
-      break;
-      case 'input':
-        data.location = 'center';
-        data.type ??= 'text';
-        data.placeholder ??= '';
-        data.animate ??= false;
-      break;
-      case 'confirm':
-        data.location = 'center';
-        data.animate ??= false;
-      break;
-    }
+    if(typeof data === 'string') data = {text: data};
+    
+    const config = {
+      toast: {
+        location: 'top-left',
+        animate: true,
+        autoClose: true,
+        timer: (data?.timer ?? 2000) + 200
+      },
+      alert: {
+        location: 'center',
+        animate: true,
+        autoClose: true,
+        timer: (data?.timer ?? 2000) + 200
+      },
+      input: {
+        location: 'center',
+        type: 'text',
+        placeholder: '',
+        animate: false
+      },
+      confirm: {
+        location: 'center',
+        animate: false
+      },
+    };
+    return {modalType, ...config[modalType], ...data};
   };
   /**
    * @param {ModalData} data
@@ -106,41 +130,42 @@ const bimPN = (() => {
   };
   /**
    * @param {ModalData} data 
-   * @returns {Object<string, HTMLElement>}
+   * @returns {modalHTMLElements}
    */
-  const init = ({modalType, location, icon, type, autoClose}) => {    
+  const init = ({modalType, icon, type, autoClose}) => {    
     const divPN = createSetElement(document.body, 'div');
     const article = createSetElement(divPN, 'article');
-    let content, info, sideImg, centerImg, titleB, textP, inputTag, selectTag, span, btnCont, confirm, cancel;
+    const asda = document.createElement('section');
+    let content, info, centerImg, titleH1, textP, inputTag, selectTag, span, btnCont, confirm, cancel;
 
     switch(modalType){
+      case 'toast':
+        content = createSetElement(article, 'section', 'content');
+        info = createSetElement(content, 'div', 'info');
+
+        TinnerCont = createSetElement(info, 'div', 'innerCont');
+        textP = createSetElement(TinnerCont, 'p', 'text');
+      break;
       case 'alert':
         content = createSetElement(article, 'section', 'content');
-
-        if(location === 'center'){
-          if(icon) centerImg = createSetElement(content, 'img', ['icon', 'center']);
-          info = createSetElement(content, 'div', 'info');
-        }
-        else{
-          info = createSetElement(content, 'div', 'info');
-          if(icon) sideImg = createSetElement(info, 'img', ['icon', 'side']);
-        }
+        if(icon) centerImg = createSetElement(content, 'img', ['icon', 'center']);
+        info = createSetElement(content, 'div', 'info');
         
         TinnerCont = createSetElement(info, 'div', 'innerCont');
-
-        if(location === 'center'){
-          titleB = createSetElement(TinnerCont, 'h2', 'title');
-          if(!autoClose){
-            btnCont = createSetElement(article, 'section', 'mainBtn');
-            confirm = createSetElement(btnCont, 'button', 'confirm');
-          }
-        }
+        titleH1 = createSetElement(TinnerCont, 'h1', 'title');
         textP = createSetElement(TinnerCont, 'p', 'text');
+        
+        if(!autoClose){
+          btnCont = createSetElement(article, 'section', 'mainBtn');
+          confirm = createSetElement(btnCont, 'button', 'confirm');
+        }
       break;
       case 'input':
         content = createSetElement(article, 'section', 'content');
         info = createSetElement(content, 'div', 'info');
+
         TinnerCont = createSetElement(info, 'div', 'innerCont');
+        titleH1 = createSetElement(TinnerCont, 'h1', 'title');
         textP = createSetElement(TinnerCont, 'p', 'text');
         if(['text', 'number', 'email'].includes(type)){
           inputTag = createSetElement(TinnerCont, 'input');
@@ -149,6 +174,7 @@ const bimPN = (() => {
         else if(type === 'option'){
           selectTag = createSetElement(TinnerCont, 'select');
         }
+
         btnCont = createSetElement(article, 'section', 'mainBtn');
         confirm = createSetElement(btnCont, 'button', 'confirm');
         cancel = createSetElement(btnCont, 'button', 'cancel');
@@ -156,10 +182,10 @@ const bimPN = (() => {
       case 'confirm':
         content = createSetElement(article, 'section', 'content');
         if(icon) centerImg = createSetElement(content, 'img', ['icon', 'center']);
-
         info = createSetElement(content, 'div', 'info');
+
         TinnerCont = createSetElement(info, 'div', 'innerCont');
-        titleB = createSetElement(TinnerCont, 'h2', 'title');
+        titleH1 = createSetElement(TinnerCont, 'h1', 'title');
         textP = createSetElement(TinnerCont, 'p', 'text');
         
         btnCont = createSetElement(article, 'section', 'mainBtn');
@@ -188,18 +214,18 @@ const bimPN = (() => {
     //     <button class="cancel"></button>
     //   </section>
     // </article>`;
-    return {divPN, article, content, info, sideImg, centerImg, titleB, textP, inputTag, selectTag, span, btnCont, confirm, cancel};
+    return {divPN, article, content, info, centerImg, titleH1, textP, inputTag, selectTag, span, btnCont, confirm, cancel};
   };
   /**
-   * @param {Object<string, HTMLElement>} el 
+   * @param {modalHTMLElements} el 
    * @param {Object} data 
    */
   const setElements = async (el, data) => { 
     const {modalType, title, text, icon, location, type, placeholder, options, confirmBtnText, cancelBtnText, animate, autoClose, timer} = data;
-    const {divPN, confirm, cancel, sideImg, centerImg, titleB, textP, inputTag, selectTag, span} = el;
+    const {divPN, article, content, info, centerImg, titleH1, textP, inputTag, selectTag, span, btnCont, confirm, cancel} = el;
     
     textP.innerText = text;
-    if(titleB) titleB.innerText = title || '';
+    if(titleH1) titleH1.innerText = title || '';
     if(confirm) confirm.innerText = confirmBtnText || 'Confirm';
     if(cancel) cancel.innerText = cancelBtnText || 'Cancel';
     
@@ -209,55 +235,40 @@ const bimPN = (() => {
       bimpnLocation: location,
     });
 
-    if(icon){
-      if(sideImg){
-        sideImg.src = icons[icon];
-        sideImg.alt = 'icon';
-      }
-      if(centerImg){
-        centerImg.src = icons[icon];
-        centerImg.alt = 'icon';
-      }
+    if(icon && centerImg){
+      centerImg.src = icons[icon];
+      centerImg.alt = 'icon';
     }
 
-    if(animate) el.divPN.dataset.bimpnAnimate = 'start';
-    if(modalType === 'alert'){
-      if(autoClose || location !== 'center'){
-        await delay(timer);
-        if(animate) el.divPN.dataset.bimpnAnimate = 'end';
-        await delay(180);
-        document.body.removeChild(divPN);
-      }
-      else{
-        el.divPN.dataset.bimpnAutoClose = '';
-        el.confirm.innerText = 'Ok';
-        el.confirm.addEventListener('click', async () => {
-          if(animate){
-            el.divPN.dataset.bimpnAnimate = 'end';
-            await delay(180);
-          }
-          document.body.removeChild(divPN);
-        });
-      }
+    if(animate) divPN.dataset.bimpnAnimate = 'start';
+    if(modalType === 'toast' || autoClose){
+      await delay(timer);
+      if(animate) divPN.dataset.bimpnAnimate = 'end';
+      await delay(290);
+      document.body.contains(divPN) && document.body.removeChild(divPN);
     }
-    else if(modalType === 'input'){
-      if(['text', 'number', 'email'].includes(type)){
-        Object.assign(el.inputTag, {
-          type,
-          placeholder,
-          required: true,
-        });
-      }
-      else if(type === 'option'){
-        for(const option of options)
-          el.selectTag.innerHTML += `<option value="${option}">${option}</option>`;
-      }
+    else if(modalType === 'toast'){
+      divPN.dataset.bimpnAutoClose = '';
+      confirm.innerText = 'Ok';
+      confirm.addEventListener('click', async () => {
+        if(animate){
+          divPN.dataset.bimpnAnimate = 'end';
+          await delay(290);
+        }
+        document.body.contains(divPN) && document.body.removeChild(divPN);
+      });
+    }
+    if(modalType === 'input' && ['text', 'number', 'email'].includes(type)){
+      Object.assign(inputTag, {type, placeholder, required: true});
+    }
+    else if(modalType === 'input' && type === 'option'){
+      selectTag.innerHTML = options.map(option => `<option value="${option}">${option}</option>`).join('');
     }
   };
   /**
    * @param {Object<string, HTMLElement>} el 
    * @param {String} type  
-   * @param {(result: Results) => void} callback
+   * @param {(result: Results | null) => void} callback
    */
   const buttonEvents = (el, type, callback) => {
     el.divPN.addEventListener('click', e => {
@@ -265,7 +276,7 @@ const bimPN = (() => {
       const tButton = e.target.closest('button');
       
       if(!tArticle) return callback(null);
-      if(!tButton) return;
+      if(!tButton) return; 
 
       const isConfirmed = tButton.classList.contains('confirm');
       const isCancelled = tButton.classList.contains('cancel');
@@ -289,11 +300,26 @@ const bimPN = (() => {
   class BimPushNotifications {
     constructor(){}
     /**
+     * @typedef {Object} ToastPN
+     * @property {string} text - The toast message.
+     * @property {Locations} [location] - The location of the toast on the screen (default: 'top-left').
+     * @property {boolean} [animate] - Enable toast animation (default: true).
+     * @property {number} [timer] - Duration (in milliseconds) before the toast disappears (default: 2000).
+     * 
+     * @param {ToastPN} data
+     */
+    toast = (data) => {
+      data = setDefaultValues('toast', data);
+      validate(data, ['text']);
+      
+      const el = init(data);
+      setElements(el, data);
+    };
+    /**
      * @typedef {Object} AlertPN
      * @property {string} title - The title of the alert.
      * @property {string} text - The alert message.
      * @property {Icon} icon - The type of icon to display.
-     * @property {Locations} [location] - The location of the alert on the screen (default: 'top-left').
      * @property {boolean} [animate] - Enable alert animation (default: true).
      * @property {boolean} [autoClose] - Toggle auto close (default: true).
      * @property {number} [timer] - Duration (in milliseconds) before the alert disappears (default: 2000).
@@ -301,9 +327,9 @@ const bimPN = (() => {
      * @param {AlertPN} data
      */
     alert = (data) => {
-      setDefaultValues('alert', data);
+      data = setDefaultValues('alert', data);
       validate(data, ['text']);
-  
+
       const el = init(data);
       setElements(el, data);
     };
@@ -320,11 +346,11 @@ const bimPN = (() => {
      * @param {InputPN} data
      * @returns {Promise<Results>}
      */
-    input = async (data) => {
-      setDefaultValues('input', data);
+    input = (data) => {
+      data = setDefaultValues('input', data);
       
-      (['text', 'number', 'email'].includes(data.type)) ? validate(data, ['text']) :
-      (data.type === 'option') ? validate(data, ['text', 'options']) :
+      ['text', 'number', 'email'].includes(data.type) ? validate(data, ['text']) :
+      data.type === 'option' ? validate(data, ['text', 'options']) :
       (() => {throw new Error(`Invalid input type: '${data.type}'.`)})();
       
       const el = init(data);
@@ -335,9 +361,10 @@ const bimPN = (() => {
           if(result) resolve(result);
           if(data.animate){
             el.divPN.dataset.bimpnAnimate = 'end';
-            await delay(180);
+            await delay(290);
           }
-          document.body.removeChild(el.divPN);
+          if(document.body.contains(el.divPN))
+            document.body.removeChild(el.divPN);
         });
       });
     };
@@ -352,8 +379,8 @@ const bimPN = (() => {
      * @param {ConfirmPN} data
      * @returns {Promise<Results>}
      */
-    confirm = async (data) => {
-      setDefaultValues('confirm', data);
+    confirm = (data) => {
+      data = setDefaultValues('confirm', data);
       validate(data, ['text']);
   
       const el = init(data);
@@ -364,9 +391,10 @@ const bimPN = (() => {
           if(result) resolve(result);
           if(data.animate){
             el.divPN.dataset.bimpnAnimate = 'end';
-            await delay(180);
+            await delay(290);
           }
-          document.body.removeChild(el.divPN);
+          if(document.body.contains(el.divPN))
+            document.body.removeChild(el.divPN);
         });
       });
     };

@@ -1,7 +1,11 @@
 pnSettings = {
-  alert: {
+  toast: {
     icon: 'check',
     location: 'top-left',
+    animate: 'true',
+  },
+  alert: {
+    icon: 'check',
     animate: 'true',
     autoClose: 'true',
   },

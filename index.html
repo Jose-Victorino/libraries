@@ -14,6 +14,38 @@
 <body>
   <main class="cont">
     <article class="pushN">
+      <section class="toast">
+        <h3>Toast</h3>
+        <div>
+          <pre class="toastCode code">
+            <button onclick="runCode('toast')"><img src="./assets/images/svg/play.svg" alt="run-code"></button>
+<code><span class="dblue">bimPN</span>.<span class="yellow">toast</span><span class="dyellow">(</span><span class="purple">{</span>
+  <span class="lblue">text:</span> <span class="orange">'Lorem, ipsum dolor.'</span>,<span class="pastelocation"><br>  <span class="lblue">location:</span> <span class="orange">'top-left'</span>,</span><span class="pasteanimate"><br>  <span class="lblue">animate:</span> <span class="dblue">true</span>,</span>
+  <span class="lblue">timer:</span> <span class="mint">2000</span>,
+<span class="purple">}</span><span class="dyellow">)</span>;</code>
+          </pre>
+          <div class="buttonLists">
+            <div class="property">
+              <p>location</p>
+              <ul data-radioBtns>
+                <li class="selected"><button>top-left</button></li>
+                <li><button>top-middle</button></li>
+                <li><button>top-right</button></li>
+                <li><button>bottom-left</button></li>
+                <li><button>bottom-middle</button></li>
+                <li><button>bottom-right</button></li>
+              </ul>
+            </div>
+            <div class="property">
+              <p>animate</p>
+              <ul data-radioBtns>
+                <li class="selected"><button>true</button></li>
+                <li><button>false</button></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
       <section class="alert">
         <h3>Alert</h3>
         <div>
@@ -21,24 +53,14 @@
             <button onclick="runCode('alert')"><img src="./assets/images/svg/play.svg" alt="run-code"></button>
 <code><span class="dblue">bimPN</span>.<span class="yellow">alert</span><span class="dyellow">(</span><span class="purple">{</span>
   <span class="lblue">title:</span> <span class="orange">'Lorem, ipsum!'</span>,
-  <span class="lblue">text:</span> <span class="orange">'Lorem, ipsum dolor.'</span>,<span class="pasteicon"><br>  <span class="lblue">icon:</span> <span class="orange">'check'</span>,</span><span class="pastelocation"><br>  <span class="lblue">location:</span> <span class="orange">'top-left'</span>,</span><span class="pasteanimate"><br>  <span class="lblue">animate:</span> <span class="dblue">true</span>,</span><span class="pasteautoClose"><br>  <span class="lblue">autoClose:</span> <span class="dblue">true</span>,</span>
+  <span class="lblue">text:</span> <span class="orange">'Lorem, ipsum dolor.'</span>,<span class="pasteicon"><br>  <span class="lblue">icon:</span> <span class="orange">'check'</span>,</span><span class="pasteanimate"><br>  <span class="lblue">animate:</span> <span class="dblue">true</span>,</span><span class="pasteautoClose"><br>  <span class="lblue">autoClose:</span> <span class="dblue">true</span>,</span>
   <span class="lblue">timer:</span> <span class="mint">2000</span>,
 <span class="purple">}</span><span class="dyellow">)</span>;</code>
           </pre>
           <div class="buttonLists">
             <div class="property">
-              <p>location</p>
-              <ul class="locationValue" data-radioBtns>
-                <li class="selected"><button>top-left</button></li>
-                <li><button>bottom-left</button></li>
-                <li><button>top-right</button></li>
-                <li><button>bottom-right</button></li>
-                <li><button>center</button></li>
-              </ul>
-            </div>
-            <div class="property">
               <p>icon</p>
-              <ul class="locationValue" data-radioBtns>
+              <ul data-radioBtns>
                 <li class="selected"><button>check</button></li>
                 <li><button>info</button></li>
                 <li><button>warning</button></li>
@@ -48,14 +70,14 @@
             </div>
             <div class="property">
               <p>animate</p>
-              <ul class="locationValue" data-radioBtns>
+              <ul data-radioBtns>
                 <li class="selected"><button>true</button></li>
                 <li><button>false</button></li>
               </ul>
             </div>
             <div class="property">
               <p>autoClose</p>
-              <ul class="locationValue" data-radioBtns>
+              <ul data-radioBtns>
                 <li class="selected"><button>true</button></li>
                 <li><button>false</button></li>
               </ul>
@@ -71,7 +93,7 @@
 <code><span class="dblue">bimPN</span>.<span class="yellow">input</span><span class="dyellow">(</span><span class="purple">{</span>
   <span class="lblue">title:</span> <span class="orange">'Input!'</span>,
   <span class="lblue">text:</span> <span class="orange">'input a value.'</span>,<span class="pastetype"><br>  <span class="lblue">type:</span> <span class="orange">'text'</span>,</span>
-  <!-- <span class="lblue">placeholder:</span> <span class="orange">'placeholder'</span>, -->
+  <span class="lblue">placeholder:</span> <span class="orange">'placeholder'</span>,<span class="pasteanimate"><br>  <span class="lblue">animate:</span> <span class="dblue">true</span>,</span>
 <span class="purple">}</span><span class="dyellow">)</span>
 .<span class="yellow">then</span><span class="dyellow">(</span><span class="purple">(</span><span class="lblue">res</span><span class="purple">)</span> <span class="dblue pasteautoClose">=></span> <span class="purple">{</span>
   <span class="lblue">console</span>.<span class="yellow">log</span><span class="dblue">(</span><span class="lblue">res</span><span class="dblue">)</span>;
@@ -84,6 +106,13 @@
               <li><button>number</button></li>
               <li><button>email</button></li>
               <li><button>option</button></li>
+            </ul>
+          </div>
+          <div class="property">
+            <p>animate</p>
+            <ul data-radioBtns>
+              <li class="selected"><button>true</button></li>
+              <li><button>false</button></li>
             </ul>
           </div>
         </div>
