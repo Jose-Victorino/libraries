@@ -79,17 +79,13 @@
       }
     }
     &[data-bimpn-location="center"]{
-      &[data-bimpn-auto-close] .confirm{
-        display: flex;
-      }
       article{
         justify-content: flex-start;
       }
-      .title{
-        display: block;
-      }
     }
     &:not([data-bimpn-location="center"]){
+      --outer-padding: 12px;
+
       article{
         min-width: 200px;
         max-width: 250px;
@@ -105,33 +101,18 @@
   }
   &[data-bimpn-type="input"]{
     article{
-      flex-direction: column;
       justify-content: space-between;
-    }
-    .confirm,
-    .cancel{
-      display: flex;
     }
     .innerCont{
       max-width: 220px;
-    }
-    span{
-      display: none;
-      margin-top: 8px;
     }
     .text{
       text-align: start;
     }
   }
-  &[data-bimpn-type="confirm"]{
-    .title{
-      display: block;
-    }
-    .confirm,
-    .cancel{
-      display: flex;
-    }
-  }
+  /* &[data-bimpn-type="confirm"]{
+
+  } */
   
   &[data-bimpn-animate="start"]{
     &[data-bimpn-location*="left"]{
@@ -193,7 +174,6 @@
     width: 100%;
   }
   .title{
-    display: none;
     text-align: center;
     margin-bottom: 10px;
   }
@@ -201,13 +181,12 @@
     text-align: center;
   }
   img{
-    display: none;
     user-select: none;
   }
   span{
     color: hsl(0, 85%, 54%);
-    display: none;
     text-align: center;
+    margin-top: 8px;
   }
   .mainBtn{
     display: flex;
@@ -215,7 +194,7 @@
   }
   input, select{
     background: hsl(222, 8%, 100%);
-    display: none;
+    outline: none;
     padding: 7px;
     margin-top: 15px;
     border: 1px solid hsl(222, 9%, 20%);
@@ -226,23 +205,17 @@
     color: hsl(222, 8%, 88%);
   }
   .confirm, .cancel{
-    display: none;
     padding: 7px 16px;
     border: 1px solid hsl(222, 9%, 20%);
     border-radius: 4px;
   }
 
-  &[data-bimpn-hasimg]{
-    &[data-bimpn-type="confirm"] .center,
-    &[data-bimpn-type="alert"][data-bimpn-location="center"] .center{
-      display: block;
-      height: var(--imgSize-center);
-      margin-bottom: 20px;
-    }
-    &[data-bimpn-type="alert"]:not([data-bimpn-location="center"]) .side{
-      display: block;
-      height: var(--imgSize-side);
-    }
+  .center{
+    height: var(--imgSize-center);
+    margin-bottom: 20px;
+  }
+  .side{
+    height: var(--imgSize-side);
   }
 }
 
