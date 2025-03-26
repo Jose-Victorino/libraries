@@ -31,15 +31,9 @@ const bimPN = (() => {
    * @property {HTMLButtonElement} confirm 
    * @property {HTMLButtonElement} cancel
    */
-  /**
-   * @param {Number} ms 
-   * @returns {Promise<Results>}
-   */
   const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
   /**
-   * @param {ModalType} modalType 
-   * @param {ModalData | String} data 
-   * @returns {ModalData}
+   * @param {ModalType} modalType
    */
   const setDefaultValues = (modalType, data) => {
     if(typeof data === 'string') data = {text: data};
@@ -70,10 +64,6 @@ const bimPN = (() => {
     };
     return {modalType, ...config[modalType], ...data};
   };
-  /**
-   * @param {ModalData} data
-   * @param {Array<string>} arr
-   */
   const validate = (data, arr) => {
     Object.entries(data).forEach(([key, value]) => {
       switch(key){
@@ -111,31 +101,24 @@ const bimPN = (() => {
     });
   };
   /**
-   * @param {HTMLElement} parent 
-   * @param {String} tagName 
-   * @param {String | Array<String> | undefined} classNames 
-   * @returns {HTMLElement}
-   */
-  const createSetElement = (parent, tagName, classNames) => {
-    const child = document.createElement(tagName);
-    if(Array.isArray(classNames)){
-      child.classList.add(...classNames);
-    }
-    else if(typeof classNames === 'string'){
-      child.classList.add(classNames);
-    }
-    parent.append(child);
-    
-    return child;
-  };
-  /**
-   * @param {ModalData} data 
    * @returns {modalHTMLElements}
    */
-  const init = ({modalType, icon, type, autoClose}) => {    
+  const init = ({modalType, icon, type, autoClose}) => {
+    const createSetElement = (parent, tagName, classNames) => {
+      const child = document.createElement(tagName);
+      if(Array.isArray(classNames)){
+        child.classList.add(...classNames);
+      }
+      else if(typeof classNames === 'string'){
+        child.classList.add(classNames);
+      }
+      parent.append(child);
+      
+      return child;
+    };
+
     const divPN = createSetElement(document.body, 'div');
     const article = createSetElement(divPN, 'article');
-    const asda = document.createElement('section');
     let content, info, centerImg, titleH1, textP, inputTag, selectTag, span, btnCont, confirm, cancel;
 
     switch(modalType){
@@ -217,8 +200,7 @@ const bimPN = (() => {
     return {divPN, article, content, info, centerImg, titleH1, textP, inputTag, selectTag, span, btnCont, confirm, cancel};
   };
   /**
-   * @param {modalHTMLElements} el 
-   * @param {Object} data 
+   * @param {modalHTMLElements} el
    */
   const setElements = async (el, data) => { 
     const {modalType, title, text, icon, location, type, placeholder, options, confirmBtnText, cancelBtnText, animate, autoClose, timer} = data;
@@ -266,34 +248,44 @@ const bimPN = (() => {
     }
   };
   /**
-   * @param {Object<string, HTMLElement>} el 
-   * @param {String} type  
-   * @param {(result: Results | null) => void} callback
+   * @param {modalHTMLElements} el
+   * @returns {Promise<Results>}
    */
-  const buttonEvents = (el, type, callback) => {
-    el.divPN.addEventListener('click', e => {
-      const tArticle = e.target.closest('article');
-      const tButton = e.target.closest('button');
-      
-      if(!tArticle) return callback(null);
-      if(!tButton) return; 
-
-      const isConfirmed = tButton.classList.contains('confirm');
-      const isCancelled = tButton.classList.contains('cancel');
-      const result = {isConfirmed, isCancelled};
-      
-      if(!isConfirmed || type === 'confirm') return callback(result);
-      
-      const tag = type === 'option' ? el.selectTag : el.inputTag;
-      
-      if(type === 'option' || el.inputTag.checkValidity()){
-        result.value = tag.value;
-        return callback(result);
-      }
-      else if(tag.validationMessage !== ''){
-        el.span.innerText = 'Invalid Input';
-        el.span.style.display = 'inline';
-      }
+  const buttonEvents = (el, data, type) => {
+    return new Promise((resolve) => {
+      const closeModalPromise = async (result) => {
+        if(result) resolve(result);
+        if(data.animate){
+          el.divPN.dataset.bimpnAnimate = 'end';
+          await delay(290);
+        }
+        if(document.body.contains(el.divPN))
+          document.body.removeChild(el.divPN);
+      };
+      el.divPN.addEventListener('click', e => {
+        const tArticle = e.target.closest('article');
+        const tButton = e.target.closest('button');
+        
+        if(!tArticle) return closeModalPromise(null);
+        if(!tButton) return; 
+  
+        const isConfirmed = tButton.classList.contains('confirm');
+        const isCancelled = tButton.classList.contains('cancel');
+        const result = {isConfirmed, isCancelled};
+        
+        if(!isConfirmed || type === 'confirm') return closeModalPromise(result);
+        
+        const tag = type === 'option' ? el.selectTag : el.inputTag;
+        
+        if(type === 'option' || el.inputTag.checkValidity()){
+          result.value = tag.value;
+          return closeModalPromise(result);
+        }
+        else if(tag.validationMessage !== ''){
+          el.span.innerText = 'Invalid Input';
+          el.span.style.display = 'inline';
+        }
+      });
     });
   };
   
@@ -308,7 +300,7 @@ const bimPN = (() => {
      * 
      * @param {ToastPN} data
      */
-    toast = (data) => {
+    toast(data){
       data = setDefaultValues('toast', data);
       validate(data, ['text']);
       
@@ -326,12 +318,13 @@ const bimPN = (() => {
      * 
      * @param {AlertPN} data
      */
-    alert = (data) => {
+    alert(data){
       data = setDefaultValues('alert', data);
       validate(data, ['text']);
 
       const el = init(data);
       setElements(el, data);
+      buttonEvents(el, data);
     };
     /**
      * @typedef {Object} InputPN
@@ -346,7 +339,7 @@ const bimPN = (() => {
      * @param {InputPN} data
      * @returns {Promise<Results>}
      */
-    input = (data) => {
+    input(data){
       data = setDefaultValues('input', data);
       
       ['text', 'number', 'email'].includes(data.type) ? validate(data, ['text']) :
@@ -356,17 +349,7 @@ const bimPN = (() => {
       const el = init(data);
       setElements(el, data);
       
-      return new Promise((resolve) => {
-        buttonEvents(el, data.type, async (result) => {
-          if(result) resolve(result);
-          if(data.animate){
-            el.divPN.dataset.bimpnAnimate = 'end';
-            await delay(290);
-          }
-          if(document.body.contains(el.divPN))
-            document.body.removeChild(el.divPN);
-        });
-      });
+      return buttonEvents(el, data, data.type);
     };
     /**
      * @typedef {Object} ConfirmPN
@@ -379,24 +362,14 @@ const bimPN = (() => {
      * @param {ConfirmPN} data
      * @returns {Promise<Results>}
      */
-    confirm = (data) => {
+    confirm(data){
       data = setDefaultValues('confirm', data);
       validate(data, ['text']);
-  
+
       const el = init(data);
       setElements(el, data);
-  
-      return new Promise((resolve) => {
-        buttonEvents(el, 'confirm', async (result) => {
-          if(result) resolve(result);
-          if(data.animate){
-            el.divPN.dataset.bimpnAnimate = 'end';
-            await delay(290);
-          }
-          if(document.body.contains(el.divPN))
-            document.body.removeChild(el.divPN);
-        });
-      });
+
+      return buttonEvents(el, data, 'confirm');
     };
   };
 
