@@ -28,12 +28,12 @@ div[data-arrow-wrapper] [data-prev-arrow]{
 
 div[data-list-wrapper]{
   height: fit-content;
+  padding-inline: 1px;
 }
 
 ul[data-card-list]{
   display: flex;
   user-select: none;
-  margin-inline: 1px;
 }
 ul[data-card-list] li[data-card-item]{
   display: flex;

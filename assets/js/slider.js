@@ -1,79 +1,60 @@
-class slider{
+const bimSlider = (() => {
   /**
-   * @param {HTMLElement} parent
-   * @param {Object} data
-   * @param {'normal' | 'loop' | 'auto-scroll'} data.type
-   * @param {Boolean} data.spanWidth
-   * @param {Boolean} data.arrows
-   * @param {Boolean} data.draggable
-   * @param {Boolean} data.scrollable
-   * @param {Number} data.perPage
-   * @param {Number} data.perMove
-   * @param {Number} data.gap
-   * @param {Number} data.interval
-   * @param {'numbers' | 'dots'} data.pagination
-   * @param {Object} data.breakpoints
-   * @param {number} data.breakpoints.perPage
-   * @param {number} data.breakpoints.perMove
-   * @param {number} data.breakpoints.gap
+   * @typedef {'normal' | 'loop' | 'auto-scroll'} SliderType 
+   * @typedef {'numbers' | 'dots'} PaginationType
+   * @typedef {Object} Breakpoints
+   * @property {number} perPage
+   * @property {number} perMove
+   * @property {number} gap
+   * 
+   * @typedef {Object} Data
+   * @property {SliderType} type
+   * @property {Boolean} spanWidth
+   * @property {Boolean} arrows
+   * @property {Boolean} draggable
+   * @property {Boolean} scrollable
+   * @property {Number} perPage
+   * @property {Number} perMove
+   * @property {Number} gap
+   * @property {Number} interval
+   * @property {PaginationType} pagination
+   * @property {Breakpoints} breakpoints
    */
-  #paginationWrapper; #arrowWrapper; #listWrapper; #nextArrow; #prevArrow; #paginationCont; #paginationUl; #parent; #cards; #maxCards; #pages; #data;
-  constructor(parent, data = {}){
-    const {type, spanWidth, arrows, draggable, scrollable, perPage, perMove, gap, pagination, interval, breakpoints} = data;
-    
-    this.#paginationWrapper = document.createElement('div');
-    this.#arrowWrapper = document.createElement('div');
-    this.#listWrapper = document.createElement('div');
-    this.#nextArrow = document.createElement('img');
-    this.#prevArrow = document.createElement('img');
-    this.#paginationCont = document.createElement('div');
-    this.#paginationUl = document.createElement('ul');
-    this.#parent = parent;
-    this.#cards = parent.children;
-    this.#maxCards = parent.children.length;
-    this.#data = {
-      type: type || 'normal',
-      spanWidth: spanWidth || false,
-      arrows: arrows ?? false,
-      draggable: draggable ?? false,
-      scrollable: scrollable ?? false,
-      perPage: perPage ?? 3,
-      perMove: perMove ?? 1,
-      gap: gap ?? 10,
-      pagination: pagination ?? false,
-      interval: interval ?? 3000,
-      breakpoints: breakpoints ?? {},
-    };
-    this.#parent.dataset.cardList ='';
-    this.#paginationWrapper.dataset.paginationWrapper = '';
-    this.#arrowWrapper.dataset.arrowWrapper = '';
-    this.#listWrapper.dataset.listWrapper = '';
-    this.#nextArrow.dataset.nextArrow = '';
-    this.#prevArrow.dataset.prevArrow = '';
-    this.#paginationCont.dataset.paginationCont = '';
-    this.#paginationUl.dataset.paginationUl = '';
+  /** @type {HTMLDivElement} */   let paginationWrapper;
+  /** @type {HTMLDivElement} */   let arrowWrapper;
+  /** @type {HTMLDivElement} */   let listWrapper;
+  /** @type {HTMLImageElement} */ let nextArrow;
+  /** @type {HTMLImageElement} */ let prevArrow;
+  /** @type {HTMLDivElement} */   let paginationCont;
+  /** @type {HTMLUListElement} */ let paginationUl;
+  /** @type {HTMLElement} */      let parentEl;
+  /** @type {HTMLCollection} */   let cards;
+  /** @type {Number} */           let maxCards;
+  /** @type {HTMLCollection} */   let pages;
+  /** @type {Data} */             let sliderData;
+  /** @type {Number} */           let cardWidth;
+  /** @type {Number} */           let currentSlide = 1;
+  /** @type {Number} */           let endCard;
+  /** @type {Number} */           let translateStart;
+  /** @type {Number} */           let translateVal = 0;
 
-    this.#validation();
-    this.#styles();
-    this.#initEventHandlers();
-  }
-  #validation(){
-    if(!(this.#parent instanceof HTMLElement))
-      throw new Error(`Invalid data format '${this.#parent}'. Parent must be a HTMLElement`);
+  const validation = () => {
+    if(!(parentEl instanceof HTMLElement || parentEl instanceof Element))
+      throw new Error(`Invalid data format '${parentEl}'. Parent must be a HTMLElement`);
     
-    for(const card of this.#cards)
+    for(const card of cards)
       card.dataset.cardItem = '';
     
-    switch(this.#data.type){
+    switch(sliderData.type){
       case 'loop':
-        for(const card of this.#cards)
-          card.dataset.nthChild = Array.from(this.#cards).indexOf(card) + 1;
+        for(const card of cards)
+          card.dataset.nthChild = Array.from(cards).indexOf(card) + 1;
         
-        if(this.#data.perMove >= this.#cards.length)
+        if(sliderData.perMove >= cards.length)
           throw new Error(`PerMove must be less than the number of cards when type = 'loop'`);
       break;
       case 'auto-scroll':
-        Object.assign(this.#data, {
+        Object.assign(data, {
           draggable: false,
           arrows: false,
           scrollable: false,
@@ -87,176 +68,171 @@ class slider{
         throw new Error(`Invalid value for option: ${option}`);
     }
 
-    validate(this.#data.type, 'string', val => ['normal', 'loop', 'auto-scroll'].includes(val));
-    validate(this.#data.spanWidth, 'boolean');
-    validate(this.#data.arrows, 'boolean');
-    validate(this.#data.draggable, 'boolean');
-    validate(this.#data.perPage, 'number', val => val > 0);
-    validate(this.#data.perMove, 'number', val => val > 0);
-    validate(this.#data.scrollable, 'boolean');
-    validate(this.#data.interval, 'number', val => val >= 3000);
-    validate(this.#data.gap, 'number', val => val > 0);
+    validate(sliderData.type, 'string', val => ['normal', 'loop', 'auto-scroll'].includes(val));
+    validate(sliderData.spanWidth, 'boolean');
+    validate(sliderData.arrows, 'boolean');
+    validate(sliderData.draggable, 'boolean');
+    validate(sliderData.perPage, 'number', val => val > 0);
+    validate(sliderData.perMove, 'number', val => val > 0);
+    validate(sliderData.scrollable, 'boolean');
+    validate(sliderData.interval, 'number', val => val >= 3000);
+    validate(sliderData.gap, 'number', val => val > 0);
 
-    if(typeof this.#data.pagination === 'string')
-      validate(this.#data.pagination, 'string', val => ['numbers', 'dots'].includes(val));
-    else if(typeof this.#data.pagination !== 'boolean')
+    if(typeof sliderData.pagination === 'string')
+      validate(sliderData.pagination, 'string', val => ['numbers', 'dots'].includes(val));
+    else if(typeof sliderData.pagination !== 'boolean')
       throw new Error(`Invalid data format 'pagination'`);
     
-    Object.entries(this.#data.breakpoints).forEach(([bpVal, values]) => {
+    Object.entries(sliderData.breakpoints).forEach(([bpVal, values]) => {
       if(isNaN(bpVal) || bpVal <= 0)
         throw new Error('All breakpoint values must be a positive number.');
       
       if(Object.values(values).some(v => isNaN(v) || v <= 0))
         throw new Error(`Invalid value inside ${bpVal} breakpoint. Value must be a positive number.`);
     });
-    this.#data.breakpoints[10000] = {
-      perPage: this.#data.perPage,
-      perMove: this.#data.perMove,
-      gap: this.#data.gap,
+    sliderData.breakpoints[10000] = {
+      perPage: sliderData.perPage,
+      perMove: sliderData.perMove,
+      gap: sliderData.gap,
     };
-  }
-  #styles(){
-    this.#parent.parentNode.insertBefore(this.#listWrapper, this.#parent);
-    this.#listWrapper.append(this.#parent);
-    this.#listWrapper.parentNode.insertBefore(this.#arrowWrapper, this.#listWrapper);
-    this.#arrowWrapper.append(this.#listWrapper, this.#nextArrow, this.#prevArrow);
-    this.#arrowWrapper.parentNode.insertBefore(this.#paginationWrapper, this.#arrowWrapper);
-    this.#paginationWrapper.append(this.#arrowWrapper, this.#paginationCont);
-    this.#paginationCont.append(this.#paginationUl);
+  };
+  const initElements = () => {
+    parentEl.parentNode.insertBefore(listWrapper, parentEl);
+    listWrapper.append(parentEl);
+    listWrapper.parentNode.insertBefore(arrowWrapper, listWrapper);
+    arrowWrapper.append(listWrapper);
+    arrowWrapper.parentNode.insertBefore(paginationWrapper, arrowWrapper);
+    paginationWrapper.append(arrowWrapper);
     
-    for(const card of this.#cards)
-      card.style.minWidth = `calc((100% - ${this.#data.gap * (this.#data.perPage - 1)}px) / ${this.#data.perPage})`;
-    
-    if(['loop', 'auto-scroll'].includes(this.#data.type)){
-      const fragment = document.createDocumentFragment();
-      for(let i = 0; i < 2; i++)
-      for(const card of this.#cards)
-        fragment.append(card.cloneNode(true));
-      
-      this.#parent.append(fragment);
-    }
-    if(this.#data.arrows){
-      this.#nextArrow.src = `./assets/images/svg/chevron-right.svg`;
-      this.#prevArrow.src = `./assets/images/svg/chevron-left.svg`;
-      this.#nextArrow.alt = 'nextArrow';
-      this.#prevArrow.alt = 'prevArrow';
-      
-      if(this.#data.type === 'normal') this.#prevArrow.style.opacity = '0.3';
-    }
-    else{
-      this.#prevArrow.style.display = 'none';
-      this.#nextArrow.style.display = 'none';
-    }
-
-    if(this.#data.pagination){
-      this.#paginationUl.dataset.paginationUl = this.#data.pagination;
-
-      for(let i = 0; i < this.#maxCards; i++)
-        this.#paginationUl.append(document.createElement('li'));
-      
-      this.#pages = this.#paginationUl.children;
-      
-      Array.from(this.#pages).forEach((page, i) => {
-        page.dataset.liPage = "";
-        
-        if(this.#data.pagination === 'numbers')
-          page.innerText = i + 1;
-      });
-      this.#pages[0].dataset.currentPage = 'true';
-    }
-    else this.#paginationCont.style.display = 'none';
-    
-    Array.from(this.#cards).forEach((card, i) => {
-      card.classList.toggle('currentSlide', (i % this.#maxCards === 0));
+    Array.from(cards).forEach((card, i) => {
+      card.style.minWidth = `calc((100% - ${sliderData.gap * (sliderData.perPage - 1)}px) / ${sliderData.perPage})`;
+      card.classList.toggle('currentSlide', (i % maxCards === 0));
     });
 
-    this.#parent.style.gap = `${this.#data.gap}px`;
-    this.#arrowWrapper.style.marginInline = (this.#data.arrows) ? '15px' : '';
-    this.#listWrapper.style.overflow = (this.#data.spanWidth) ? '' : 'hidden';
-  }
-  #initEventHandlers(){
+    parentEl.style.gap = `${sliderData.gap}px`;
+    arrowWrapper.style.marginInline = (sliderData.arrows) ? '15px' : '';
+    listWrapper.style.overflow = (sliderData.spanWidth) ? '' : 'hidden';
+
+    if(['loop', 'auto-scroll'].includes(sliderData.type)){
+      const fragment = document.createDocumentFragment();
+      for(let i = 0; i < 2; i++)
+      for(const card of cards)
+        fragment.append(card.cloneNode(true));
+      
+      parentEl.append(fragment);
+    }
+    if(sliderData.arrows){
+      arrowWrapper.append(nextArrow, prevArrow);
+
+      nextArrow.src = `./assets/images/svg/chevron-right.svg`;
+      prevArrow.src = `./assets/images/svg/chevron-left.svg`;
+      nextArrow.alt = 'nextArrow';
+      prevArrow.alt = 'prevArrow';
+      
+      if(sliderData.type === 'normal') prevArrow.style.opacity = '0.3';
+    }
+    if(sliderData.pagination){
+      paginationWrapper.append(paginationCont);
+      paginationCont.append(paginationUl);
+
+      paginationUl.dataset.paginationUl = sliderData.pagination;
+
+      for(let i = 0; i < maxCards; i++)
+        paginationUl.append(document.createElement('li'));
+      
+      pages = paginationUl.children;
+      
+      Array.from(pages).forEach((page, i) => {
+        page.dataset.liPage = '';
+        
+        if(sliderData.pagination === 'numbers')
+          page.innerText = i + 1;
+      });
+      pages[0].dataset.currentPage = 'true';
+    }
+  };
+  const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+  const translateSlider = async (t) => {
+    let doAnimate = true;
+
+    switch(sliderData.type){
+      case 'normal':
+        parentEl.style.transform = `translateX(-${translateVal}px)`;
+        if(sliderData.arrows){
+          nextArrow.style.opacity = (currentSlide === endCard) ? '0.3' : '1';
+          prevArrow.style.opacity = (currentSlide === 1) ? '0.3' : '1';
+        }
+      break;
+      case 'loop':
+        var totalTranslate = translateVal + translateStart;
+
+        parentEl.style.transform = `translateX(-${totalTranslate}px)`;
+        if(totalTranslate <= cardWidth * (maxCards - sliderData.perPage)){
+          translateVal = totalTranslate;
+          parentEl.style.transition = `transform ${t}ms`;
+          await delay(t);
+          parentEl.style.transform = `translateX(-${totalTranslate + translateStart}px)`;
+          doAnimate = false;
+        }
+        else if(totalTranslate >= translateStart * 2){
+          translateVal -= translateStart;
+          parentEl.style.transition = `transform ${t}ms`;
+          await delay(t);
+          parentEl.style.transform = `translateX(-${totalTranslate - translateStart}px)`;
+          doAnimate = false;
+        }
+      break;
+      case 'auto-scroll':
+        translateVal = cardWidth * (currentSlide - 1);
+        var totalTranslate = translateVal + translateStart;
+        
+        parentEl.style.transform = `translateX(-${totalTranslate}px)`;          
+        if(totalTranslate >= translateStart * 2){
+          translateVal = 0;
+          parentEl.style.transition = `transform ${t}ms`;
+          await delay(t);
+          parentEl.style.transform = `translateX(-${totalTranslate - translateStart}px)`;
+          doAnimate = false;
+        }
+
+        currentSlide = currentSlide % maxCards || maxCards;
+      break;
+    }
+    parentEl.style.transition = (doAnimate) ? `transform ${t}ms` : '';
+    
+    await delay(t);
+    parentEl.style.transition = '';
+    Array.from(cards).forEach((card, i) => {
+      card.classList.toggle('currentSlide', i % maxCards === currentSlide - 1);
+    });
+  };
+  const initEventHandlers = () => {
     let isDragging = false;
     let dragStart, dragVal, valStart;
     let lastMouseX, velocity = 0, acceleration = 0.3;
-    let cardWidth, currentSlide = 1, endCard, translateStart, translateVal = 0;
     
-    const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
-    const updateSliderTranslate = async (duration = 300) => {
-      let doAnimate = true;
-      switch(this.#data.type){
-        case 'normal':
-          this.#parent.style.transform = `translateX(-${translateVal}px)`;
-          if(this.#data.arrows){
-            this.#nextArrow.style.opacity = (currentSlide === endCard) ? '0.3' : '1';
-            this.#prevArrow.style.opacity = (currentSlide === 1) ? '0.3' : '1';
-          }
-        break;
-        case 'loop':
-          var totalTranslate = translateVal + translateStart;
-
-          this.#parent.style.transform = `translateX(-${totalTranslate}px)`;
-          if(totalTranslate <= cardWidth * (this.#maxCards - this.#data.perPage)){
-            translateVal = totalTranslate;
-            this.#parent.style.transition = `transform ${duration}ms`;
-            await delay(duration);
-            this.#parent.style.transform = `translateX(-${totalTranslate + translateStart}px)`;
-            doAnimate = false;
-          }
-          else if(totalTranslate >= translateStart * 2){
-            translateVal -= translateStart;
-            this.#parent.style.transition = `transform ${duration}ms`;
-            await delay(duration);
-            this.#parent.style.transform = `translateX(-${totalTranslate - translateStart}px)`;
-            doAnimate = false;
-          }
-        break;
-        case 'auto-scroll':
-          translateVal = cardWidth * (currentSlide - 1);
-          var totalTranslate = translateVal + translateStart;
-          
-          this.#parent.style.transform = `translateX(-${totalTranslate}px)`;          
-          if(totalTranslate >= translateStart * 2){
-            translateVal = 0;
-            this.#parent.style.transition = `transform ${duration}ms`;
-            await delay(duration);
-            this.#parent.style.transform = `translateX(-${totalTranslate - translateStart}px)`;
-            doAnimate = false;
-          }
-
-          currentSlide = currentSlide % this.#maxCards || this.#maxCards;
-        break;
-      }
-      this.#parent.style.transition = (doAnimate) ? `transform ${duration}ms` : '';
-      
-      await delay(duration);
-      this.#parent.style.transition = '';
-      Array.from(this.#cards).forEach((card, i) => {
-        card.classList.toggle('currentSlide', i % this.#data.maxCards === currentSlide - 1);
-      });
-    };
     const updatePagination = () => {
-      for(let i = 0; i < this.#pages.length; i++)
-        this.#pages[i].dataset.currentPage = i === (currentSlide - 1) ? 'true' : 'false';
+      for(let i = 0; i < pages.length; i++)
+        pages[i].dataset.currentPage = i === currentSlide - 1 ? 'true' : 'false';
     };
     const pressStart = (e) => {
-      const event = (e.type === 'touchstart') ? e.touches[0] : e;
+      const pageX = e.touches?.[0].pageX || e.pageX;
       isDragging = true;
-      dragStart = event.pageX;
-      lastMouseX = event.pageX;
+      lastMouseX = dragStart = pageX;
       valStart = translateVal;
     };
     const pressMove = (e) => {
       if(!isDragging) return;
 
-      const dragEnd = cardWidth * (this.#maxCards - this.#data.perPage);
-      const event = (e.type === 'touchmove') ? e.touches[0] : e;
-      const deltaX = event.pageX - lastMouseX;
+      const dragEnd = cardWidth * (maxCards - sliderData.perPage);
+      const pageX = e.touches?.[0].pageX || e.pageX;
+      const deltaX = pageX - lastMouseX;
 
       velocity += deltaX * acceleration;
-      lastMouseX = event.pageX;
-      dragVal = valStart - (event.pageX - dragStart) - velocity;
+      lastMouseX = pageX;
+      dragVal = valStart - (pageX - dragStart) - velocity;
       
-      switch(this.#data.type){
+      switch(sliderData.type){
         case 'normal':
           if(dragVal > dragEnd){
             translateVal = dragEnd;
@@ -268,10 +244,10 @@ class slider{
           }
           else translateVal = dragVal;
 
-          this.#parent.style.transform = `translateX(-${translateVal}px)`;
+          parentEl.style.transform = `translateX(-${translateVal}px)`;
         break;
         case 'loop':
-          this.#parent.style.transform = `translateX(-${dragVal + translateStart}px)`;
+          parentEl.style.transform = `translateX(-${dragVal + translateStart}px)`;
           translateVal = dragVal;
         break;
       }
@@ -282,7 +258,7 @@ class slider{
       if(isDragging && dragVal){
         let translatedNum = [], closestCard;
 
-        switch(this.#data.type){
+        switch(sliderData.type){
           case 'normal':
             for(let i = 0; i < endCard; i++)
               translatedNum.push(Math.abs(i * cardWidth - dragVal));
@@ -291,30 +267,23 @@ class slider{
             translateVal = closestCard * cardWidth;
           break;
           case 'loop':
-            for(let i = 0; i < this.#cards.length; i++)
+            for(let i = 0; i < cards.length; i++)
               translatedNum.push(Math.abs(i * cardWidth - (dragVal + translateStart)));
             closestCard = translatedNum.indexOf(Math.min(...translatedNum));
-            currentSlide = (closestCard % this.#maxCards) + 1;
+            currentSlide = (closestCard % maxCards) + 1;
             translateVal = (closestCard * cardWidth) - translateStart;
           break;
         }
-
-        updateSliderTranslate();
-        if(this.#data.pagination) updatePagination();
+        translateSlider(300);
+        if(sliderData.pagination) updatePagination();
       }
       isDragging = false;
     };
-    const arrowPressed = (btn) => {
-      if(btn === 'nextArrow'){
-        currentSlide += this.#data.perMove;
-        translateVal += cardWidth * this.#data.perMove;
-      }
-      else if(btn === 'prevArrow'){
-        currentSlide -= this.#data.perMove;
-        translateVal -= cardWidth * this.#data.perMove;
-      }
+    const arrowPressed = (dir) => {
+      currentSlide += dir * sliderData.perMove;
+      translateVal += dir * cardWidth * sliderData.perMove;
 
-      switch(this.#data.type){
+      switch(sliderData.type){
         case 'normal':
           if(currentSlide > endCard){
             currentSlide = endCard;
@@ -327,19 +296,19 @@ class slider{
         break;
         case 'loop':
           if(currentSlide < 1)
-            currentSlide += this.#maxCards;
-          else if(currentSlide > this.#maxCards)
-            currentSlide -= this.#maxCards;
+            currentSlide += maxCards;
+          else if(currentSlide > maxCards)
+            currentSlide -= maxCards;
         break;
       }
 
-      updateSliderTranslate();
-      if(this.#data.pagination) updatePagination();
+      translateSlider(300);
+      if(sliderData.pagination) updatePagination();
     };
     const scrollUpdatePosition = (e) => {
       e.preventDefault();
 
-      switch(this.#data.type){
+      switch(sliderData.type){
         case 'normal':
           if(e.wheelDelta < 0 && currentSlide < endCard)
             currentSlide++;
@@ -355,37 +324,37 @@ class slider{
             currentCard++;
           else
             currentCard--;
-          currentSlide = currentCard % this.#maxCards || this.#maxCards;
+          currentSlide = currentCard % maxCards || maxCards;
           translateVal = (cardWidth * (currentCard - 1)) - translateStart;
         break;
       }
 
-      updateSliderTranslate(150);
-      if(this.#data.pagination) updatePagination();
+      translateSlider(180);
+      if(sliderData.pagination) updatePagination();
     };
     const paginationUpdatePosition = (e) => {
       const target = e.target.closest('li[data-li-page]');
       if(!target || target.dataset.currentPage === 'true') return;
       
-      currentSlide = Array.from(this.#pages).indexOf(target) + 1;
+      currentSlide = Array.from(pages).indexOf(target) + 1;
       
-      switch(this.#data.type){
+      switch(sliderData.type){
         case 'loop':
           let currentCard = ((translateVal + translateStart) / cardWidth) + 1;
           
-          const targetSlide = currentSlide % this.#maxCards || this.#maxCards;
-          const allCards = this.#parent.children;
+          const targetSlide = currentSlide % maxCards || maxCards;
+          const allCards = [...parentEl.children];
           
-          for(let i = 0; i < this.#maxCards / 2; i++){
+          for(let i = 0; i < maxCards / 2; i++){
             const right = allCards[currentCard + i];
             const left = allCards[currentCard - i - 2];
 
             if(right.dataset.nthChild === targetSlide.toString()){
-              currentCard = Array.from(allCards).indexOf(right);
+              currentCard = allCards.indexOf(right);
               break;
             }
             else if(left.dataset.nthChild === targetSlide.toString()){
-              currentCard = Array.from(allCards).indexOf(left);
+              currentCard = allCards.indexOf(left);
               break;
             }
           }
@@ -396,99 +365,99 @@ class slider{
         break;
       }
       
-      updateSliderTranslate();
-      if(this.#data.pagination) updatePagination();
+      translateSlider(300);
+      if(sliderData.pagination) updatePagination();
     };
     const autoScroll = async () => {
-      await delay(this.#data.interval);
+      await delay(sliderData.interval);
       currentSlide++;
-      updateSliderTranslate();
+      translateSlider(300);
       autoScroll();
     };
     const updateSliderConfig = () => {
-      cardWidth = this.#cards[0].getBoundingClientRect().width + this.#data.gap;
+      cardWidth = cards[0].getBoundingClientRect().width + sliderData.gap;
       translateVal = cardWidth * (currentSlide - 1);
       
-      switch(this.#data.type){
+      switch(sliderData.type){
         case 'normal':
-          this.#parent.style.transform = `translateX(-${translateVal}px)`;
-          const currentEndCard = this.#maxCards - (this.#data.perPage - 1);
+          parentEl.style.transform = `translateX(-${translateVal}px)`;
+          const currentEndCard = maxCards - (sliderData.perPage - 1);
           
           if(currentSlide > currentEndCard)
             currentSlide = currentEndCard;
           
-          if(this.#data.arrows){
-            this.#nextArrow.style.opacity = currentSlide === currentEndCard ? '0.3' : '1';
-            this.#prevArrow.style.opacity = currentSlide === 1 ? '0.3' : '1';
+          if(sliderData.arrows){
+            nextArrow.style.opacity = currentSlide === currentEndCard ? '0.3' : '1';
+            prevArrow.style.opacity = currentSlide === 1 ? '0.3' : '1';
           }
-          if(this.#data.pagination){
-            for(let i = 0; i < this.#pages.length; i++){
-              this.#pages[i].style.display = i < currentEndCard ? 'flex' : 'none';
+          if(sliderData.pagination){
+            for(let i = 0; i < pages.length; i++){
+              pages[i].style.display = i < currentEndCard ? 'flex' : 'none';
             }
             updatePagination();
           }
           endCard = currentEndCard;
         break;
         case 'loop':
-          translateStart = cardWidth * (this.#cards.length / 3);
+          translateStart = cardWidth * (cards.length / 3);
     
-          this.#parent.style.transform = `translateX(-${translateStart + translateVal}px)`;
+          parentEl.style.transform = `translateX(-${translateStart + translateVal}px)`;
         break;
         case 'auto-scroll':
-          translateStart = cardWidth * (this.#cards.length / 3);
+          translateStart = cardWidth * (cards.length / 3);
     
-          this.#parent.style.transform = `translateX(-${translateStart + translateVal}px)`;
+          parentEl.style.transform = `translateX(-${translateStart + translateVal}px)`;
         break;
       }
     };
     const breakpointsHandler = () => {
-      const closestBpVal = Object.keys(this.#data.breakpoints)
+      const closestBpVal = Object.keys(sliderData.breakpoints)
         .map(Number)
         .filter(bp => bp >= window.innerWidth)
         .sort((a, b) => a - b)[0] ?? null;
 
       if(closestBpVal !== null){
-        const {perPage: bpPerPage, perMove: bpPerMove, gap: bpGap} = this.#data.breakpoints[closestBpVal];
+        const {perPage: bpPerPage, perMove: bpPerMove, gap: bpGap} = sliderData.breakpoints[closestBpVal];
 
-        Object.assign(this.#data, {
-          perPage: bpPerPage ?? this.#data.perPage,
-          perMove: bpPerMove ?? this.#data.perMove,
-          gap: bpGap ?? this.#data.gap,
+        Object.assign(sliderData, {
+          perPage: bpPerPage ?? sliderData.perPage,
+          perMove: bpPerMove ?? sliderData.perMove,
+          gap: bpGap ?? sliderData.gap,
         });
         
-        if(this.#data.type === 'normal' && this.#data.arrows){
-          this.#nextArrow.style.opacity = (currentSlide === endCard) ? '0.3' : '1';
-          this.#prevArrow.style.opacity = (currentSlide === 1) ? '0.3' : '1';
+        if(sliderData.type === 'normal' && sliderData.arrows){
+          nextArrow.style.opacity = (currentSlide === endCard) ? '0.3' : '1';
+          prevArrow.style.opacity = (currentSlide === 1) ? '0.3' : '1';
         }
-        this.#parent.style.gap = `${this.#data.gap}px`;
+        parentEl.style.gap = `${sliderData.gap}px`;
         
-        for(const card of this.#cards){
-          card.style.minWidth = `calc((100% - ${this.#data.gap * (this.#data.perPage - 1)}px) / ${this.#data.perPage})`;
+        for(const card of cards){
+          card.style.minWidth = `calc((100% - ${sliderData.gap * (sliderData.perPage - 1)}px) / ${sliderData.perPage})`;
         }
       }
     };
-    if(this.#data.type === 'auto-scroll'){
+    if(sliderData.type === 'auto-scroll'){
       autoScroll();
     }
     else{
-      this.#parent.addEventListener('touchstart', pressStart);
-      this.#parent.addEventListener('touchmove', pressMove);
+      parentEl.addEventListener('touchstart', pressStart);
+      parentEl.addEventListener('touchmove', pressMove);
       document.addEventListener('touchend', pressEnd);
     }
-    if(this.#data.draggable){
-      this.#parent.addEventListener('mousedown', pressStart);
-      this.#parent.addEventListener('mousemove', pressMove);
+    if(sliderData.draggable){
+      parentEl.addEventListener('mousedown', pressStart);
+      parentEl.addEventListener('mousemove', pressMove);
       document.addEventListener('mouseup', pressEnd);
     }
-    if(this.#data.arrows){
-      this.#nextArrow.addEventListener('click', () => {arrowPressed('nextArrow')});
-      this.#prevArrow.addEventListener('click', () => {arrowPressed('prevArrow')});
+    if(sliderData.arrows){
+      nextArrow.addEventListener('click', () => {arrowPressed(1)});
+      prevArrow.addEventListener('click', () => {arrowPressed(-1)});
     }
-    if(this.#data.scrollable){
-      this.#parent.addEventListener('wheel', scrollUpdatePosition);
+    if(sliderData.scrollable){
+      parentEl.addEventListener('wheel', scrollUpdatePosition);
     }
-    if(this.#data.pagination){
-      this.#paginationUl.addEventListener('click', paginationUpdatePosition);
+    if(sliderData.pagination){
+      paginationUl.addEventListener('click', paginationUpdatePosition);
     }
     window.addEventListener('resize', () => {
       breakpointsHandler();
@@ -496,5 +465,54 @@ class slider{
     });
     breakpointsHandler();
     updateSliderConfig();
-  }
-} //557
+  };
+
+  class slider{
+    /**
+     * @param {HTMLElement} parent
+     * @param {Data} data
+     */
+    constructor(parent, data = {}){
+      const {type, spanWidth, arrows, draggable, scrollable, perPage, perMove, gap, pagination, interval, breakpoints} = data;
+      
+      paginationWrapper = document.createElement('div');
+      arrowWrapper = document.createElement('div');
+      listWrapper = document.createElement('div');
+      nextArrow = document.createElement('img');
+      prevArrow = document.createElement('img');
+      paginationCont = document.createElement('div');
+      paginationUl = document.createElement('ul');
+      parentEl = parent;
+      cards = parent.children;      
+      maxCards = parent.children.length;
+      
+      sliderData = {
+        type: type || 'normal',
+        spanWidth: spanWidth || false,
+        arrows: arrows ?? false,
+        draggable: draggable ?? false,
+        scrollable: scrollable ?? false,
+        perPage: perPage ?? 3,
+        perMove: perMove ?? 1,
+        gap: gap ?? 10,
+        pagination: pagination ?? false,
+        interval: interval ?? 3000,
+        breakpoints: breakpoints ?? {},
+      };
+      parentEl.dataset.cardList ='';
+      paginationWrapper.dataset.paginationWrapper = '';
+      arrowWrapper.dataset.arrowWrapper = '';
+      listWrapper.dataset.listWrapper = '';
+      nextArrow.dataset.nextArrow = '';
+      prevArrow.dataset.prevArrow = '';
+      paginationCont.dataset.paginationCont = '';
+      paginationUl.dataset.paginationUl = '';
+  
+      validation();
+      initElements();
+      initEventHandlers();
+    }
+  };
+  
+  return slider;
+})();
