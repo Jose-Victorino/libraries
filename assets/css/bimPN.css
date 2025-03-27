@@ -73,6 +73,7 @@
     }
     &[data-bimpn-location*="middle"]{
       right: 50%;
+      transform: translate(50%, 0);
     }
 
     article{
