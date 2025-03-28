@@ -1,0 +1,77 @@
+nav{
+  position: sticky;
+  top: 0px;
+  background: var(--l-gray);
+  height: 65px;
+  width: 100%;
+  z-index: 10;
+
+  .desktopNav{
+    display: flex;
+    justify-content: space-between;
+    height: 100%;
+    padding-inline: 150px;
+
+    .start{
+
+    }
+    .end{
+
+    }
+    ul.navLinks{
+      display: flex;
+      height: 100%;
+      gap: 20px;
+    }
+    ul.navLinks > li > a{
+      display: flex;
+      align-items: center;
+      height: 100%;
+    }
+    ul.navLinks ul{
+      background: hsl(0, 0%, 90%);
+      position: absolute;
+      flex-direction: column;
+    }
+    ul.navLinks ul a{
+      display: flex;
+      white-space: nowrap;
+      width: 100%;
+      padding: 12px 18px;
+    }
+    ul.navLinks > li > ul{
+      top: 100%;
+    }
+    ul.navLinks > li > ul li:has(ul) > a{
+      justify-content: space-between;
+    }
+    ul.navLinks > li > ul li:has(ul) > a::after{
+      background-image: url('../images/svg/Arrow-Right.svg');
+    }
+    ul.navLinks > li > ul li ul{
+      top: 0px;
+      left: 100%;
+    }
+    ul.navLinks > li:has(ul) > a::after{
+      background-image: url('../images/svg/Arrow-Down.svg');
+    }
+    ul.navLinks li:has(ul){
+      position: relative;
+    }
+    ul.navLinks li:has(ul) ul{
+      display: none;
+    }
+    ul.navLinks li:has(ul):hover > ul{
+      display: flex;
+    }
+    ul.navLinks li:has(ul) a{
+      gap: 5px;
+    }
+    ul.navLinks li:has(ul) a::after{
+      content: '';
+      background-size: cover;
+      height: 18px;
+      aspect-ratio: 1;
+    }
+  }
+}
