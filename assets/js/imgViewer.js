@@ -118,7 +118,7 @@
       updateState();
     }
     else if(e.target.closest('.bimivm-collapseBtn'))
-      article.classList.toggle('bimivm-collapse');
+      article.classList.toggle('collapse');
     else if(e.target.closest('.bimivm-nextCont'))
       changeImage(1);
     else if(e.target.closest('.bimivm-prevCont'))
