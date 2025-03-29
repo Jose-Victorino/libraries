@@ -13,41 +13,80 @@
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap">
 </head>
 <body>
-  <nav>
-    <article class="desktopNav">
-      <div class="start">
-
+  <nav data-bimNav>
+    <div class="start">
+      <div class="logoCont">
+        <img class="logoImg" src="./assets/images/Crest-Icon.png" alt="logo">
+        <p class="logoTxt">Jose Victoirno</p>
       </div>
-      <div class="end">
-        <ul class="navLinks">
-          <li><a href="#">Home</a></li>
-          <li>
-            <a href="#">Services</a>
-            <ul>
-              <li><a href="#">Photography</a></li>
-              <li>
-                <a href="#">Videography</a>
-                <ul>
-                  <li><a href="#">Classic</a></li>
-                  <li><a href="#">Cinematic</a></li>
-                  <li>
-                    <a href="#">Bitch</a>
-                    <ul>
-                      <li><a href="#">Shit</a></li>
-                      <li><a href="#">Fuck</a></li>
-                      <li><a href="#">Cunt</a></li>
-                    </ul>
-                  </li>
-                </ul>
-              </li>
-              <li><a href="#">Video Editing</a></li>
-            </ul>
-          </li>
-          <li><a href="#">About</a></li>
-          <li><a href="#">Contact</a></li>
-        </ul>
+    </div>
+    <div class="barsCont">
+      <button class="barsBtn btn" onclick="handleOpen()" aria-label="open sidebar" aria-expanded="false" aria-controls="navbar">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512">
+          <path d="M0 96C0 78.3 14.3 64 32 64l384 0c17.7 0 32 14.3 32 32s-14.3 32-32 32L32 128C14.3 128 0 113.7 0 96zM0 256c0-17.7 14.3-32 32-32l384 0c17.7 0 32 14.3 32 32s-14.3 32-32 32L32 288c-17.7 0-32-14.3-32-32zM448 416c0 17.7-14.3 32-32 32L32 448c-17.7 0-32-14.3-32-32s14.3-32 32-32l384 0c17.7 0 32 14.3 32 32z"/>
+        </svg>
+      </button>
+    </div>
+    <div class="end">
+      <div class="closeCont">
+        <button class="closeBtn btn" onclick="handleClose()" aria-label="close sidebar">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512">
+            <path d="M342.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192 210.7 86.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L146.7 256 41.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192 301.3 297.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.3 256 342.6 150.6z"/>
+          </svg>
+        </button>
       </div>
-    </article>
+      <ul class="navLinks">
+        <li>
+          <a href="#" aria-current="page">
+            Home
+          </a>
+        </li>
+        <li>
+          <a href="#">
+            Services
+          </a>
+          <ul>
+            <li>
+              <a href="#">
+                Photography
+              </a>
+            </li>
+            <li>
+              <a href="#">
+                Videography
+              </a>
+              <ul>
+                <li><a href="#">Classic</a></li>
+                <li><a href="#">Cinematic</a></li>
+                <li>
+                  <a href="#">Bitch</a>
+                  <ul>
+                    <li><a href="#">Shit</a></li>
+                    <li><a href="#">Fuck</a></li>
+                    <li><a href="#">Cunt</a></li>
+                  </ul>
+                </li>
+              </ul>
+            </li>
+            <li>
+              <a href="#">
+                Video Editing
+              </a>
+            </li>
+          </ul>
+        </li>
+        <li>
+          <a href="#">
+            About
+          </a>
+        </li>
+        <li>
+          <a href="#">
+            Contact
+          </a>
+        </li>
+      </ul>
+    </div>
   </nav>
   <main class="cont">
     <article class="pushN">
@@ -238,6 +277,7 @@
       <button data-addToCart>Add to Cart</button>
     </div>
   </main>
+  <script src="./assets/js/bimNav.js"></script>
   <script src="./assets/js/filter.js"></script>
   <script src="./assets/js/breadcrumbs.js"></script>
   <script src="./assets/js/slider.js"></script>

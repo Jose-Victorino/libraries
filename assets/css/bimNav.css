@@ -1,77 +1,215 @@
 nav{
+  --nav-main-background: ;
+  --nav-sidebar-background: ;
+  --nav-height: 65px;
+
   position: sticky;
   top: 0px;
   background: var(--l-gray);
-  height: 65px;
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  height: var(--nav-height);
   width: 100%;
+  padding-inline: clamp(50px, 7vw, 100px);
   z-index: 10;
+}
+nav[data-bimNav] .start{
+  height: 100%;
+}
+nav[data-bimNav] .logoCont{
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 100%;
+  padding-block: 10px;
+}
+nav[data-bimNav] .logoCont .logoImg{
+  height: 100%;
+}
+nav[data-bimNav] .logoCont .logoTxt{
+  white-space: nowrap;
+}
+nav[data-bimNav] .barsCont,
+nav[data-bimNav] .closeCont{
+  display: none;
+}
 
-  .desktopNav{
+nav[data-bimNav] a{
+  white-space: nowrap;  
+}
+nav[data-bimNav] a svg{
+  fill: hsl(0, 0%, 17%);
+  height: 20px;
+}
+nav[data-bimNav] ul.navLinks{
+  display: flex;
+  height: 100%;
+  gap: 20px;
+}
+nav[data-bimNav] ul.navLinks > li > a{
+  display: flex;
+  align-items: center;
+  height: 100%;
+}
+nav[data-bimNav] ul.navLinks > li > a:has(svg){
+  gap: 8px;
+}
+nav[data-bimNav] ul.navLinks ul{
+  background: hsl(0, 0%, 90%);
+  position: absolute;
+  flex-direction: column;
+}
+nav[data-bimNav] ul.navLinks ul a{
+  display: flex;
+  white-space: nowrap;
+  width: 100%;
+  padding: 12px 18px;
+}
+nav[data-bimNav] .firstDepthSubNav{
+  top: 100%;
+}
+nav[data-bimNav] .firstDepthSubNav .hasSubNav > a{
+  justify-content: space-between;
+}
+nav[data-bimNav] .firstDepthSubNav .hasSubNav > a::after{
+  background-image: url('../images/svg/Arrow-Right.svg');
+}
+nav[data-bimNav] .firstDepthSubNav li ul{
+  top: 0px;
+  left: 100%;
+}
+nav[data-bimNav] .hasSubNav{
+  position: relative;
+}
+nav[data-bimNav] .hasSubNav a{
+  gap: 8px;
+}
+nav[data-bimNav] .hasSubNav > a::after{
+  background-image: url('../images/svg/Arrow-Down.svg');
+}
+nav[data-bimNav] .firstDepthSubNav .hasSubNav > a::after,
+nav[data-bimNav] .hasSubNav > a::after{
+  content: '';
+  background-size: cover;
+  height: 18px;
+  aspect-ratio: 1;
+}
+nav[data-bimNav] .hasSubNav ul{
+  display: none;
+}
+
+@media(min-width: 720px){
+  nav[data-bimNav] .hasSubNav:hover > ul{
     display: flex;
-    justify-content: space-between;
+  }
+}
+@media(max-width: 720px){
+  nav[data-bimNav]{
+    padding-inline: 18px;
+  }
+  nav[data-bimNav] .logoCont{
+    display: flex;
+    align-items: center;
+    gap: 8px;
     height: 100%;
-    padding-inline: 150px;
-
-    .start{
-
-    }
-    .end{
-
-    }
-    ul.navLinks{
-      display: flex;
-      height: 100%;
-      gap: 20px;
-    }
-    ul.navLinks > li > a{
-      display: flex;
-      align-items: center;
-      height: 100%;
-    }
-    ul.navLinks ul{
-      background: hsl(0, 0%, 90%);
-      position: absolute;
-      flex-direction: column;
-    }
-    ul.navLinks ul a{
-      display: flex;
-      white-space: nowrap;
-      width: 100%;
-      padding: 12px 18px;
-    }
-    ul.navLinks > li > ul{
-      top: 100%;
-    }
-    ul.navLinks > li > ul li:has(ul) > a{
-      justify-content: space-between;
-    }
-    ul.navLinks > li > ul li:has(ul) > a::after{
-      background-image: url('../images/svg/Arrow-Right.svg');
-    }
-    ul.navLinks > li > ul li ul{
-      top: 0px;
-      left: 100%;
-    }
-    ul.navLinks > li:has(ul) > a::after{
-      background-image: url('../images/svg/Arrow-Down.svg');
-    }
-    ul.navLinks li:has(ul){
-      position: relative;
-    }
-    ul.navLinks li:has(ul) ul{
-      display: none;
-    }
-    ul.navLinks li:has(ul):hover > ul{
-      display: flex;
-    }
-    ul.navLinks li:has(ul) a{
-      gap: 5px;
-    }
-    ul.navLinks li:has(ul) a::after{
-      content: '';
-      background-size: cover;
-      height: 18px;
-      aspect-ratio: 1;
-    }
+    padding-block: 10px;
+  }
+  nav[data-bimNav] .logoCont .logoTxt{
+    display: none;
+  }
+  nav[data-bimNav] .barsCont{
+    display: flex;
+    align-items: center;
+    height: 100%;
+    width: fit-content;
+  }
+  nav[data-bimNav] .barsCont svg,
+  nav[data-bimNav] .closeCont svg{
+    height: 20px;
+    fill: hsl(0, 0%, 17%);
+  }
+  nav[data-bimNav] .closeCont{
+    display: flex;
+    align-items: center;
+    height: var(--nav-height);
+    padding-inline: 15px;
+  }
+  nav[data-bimNav] .end{
+    background: hsl(0, 0%, 90%);
+    position: absolute;
+    top: 0px;
+    right: -100%;
+    height: 100vh;
+    height: 100dvh;
+    max-width: 100%;
+    min-width: 240px;
+    box-shadow: 15px 0px 20px hsl(0, 0%, 0%);
+    transition: right 0.4s ease-out;
+  }
+  nav[data-bimNav] .end.show{
+    right: 0;
+  }
+  nav[data-bimNav] li{
+    display: flex;
+  }
+  nav[data-bimNav] a{
+    white-space: wrap;
+    line-height: 1.2;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    padding: 15px 20px;
+  }
+  nav[data-bimNav] ul.navLinks{
+    flex-direction: column;
+    gap: 0;
+    height: auto;
+  }
+  nav[data-bimNav] ul.navLinks ul{
+    position: static;
+  }
+  nav[data-bimNav] .hasSubNav{
+    display: grid;
+    grid-template-rows: max-content 0fr;
+    position: static;
+    transition: grid-template-rows 0.3s ease-out;
+  }
+  nav[data-bimNav] .hasSubNav ul{
+    display: flex;
+    overflow: hidden;
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+  nav[data-bimNav] .hasSubNav li{
+    border-left: 1px solid hsl(0, 0%, 0%, 0.2);
+  }
+  nav[data-bimNav] .hasSubNav.show{
+    grid-template-rows: max-content 1fr;
+  }
+  nav[data-bimNav] .hasSubNav.show > a::after{
+    transform: rotateZ(180deg);
+  }
+  nav[data-bimNav] .hasSubNav.show > ul{
+    opacity: 1;
+  }
+  nav[data-bimNav] .firstDepthSubNav .hasSubNav > a::after,
+  nav[data-bimNav] .hasSubNav > a::after{
+    content: '';
+    background-image: url('../images/svg/Arrow-Down.svg');
+    background-size: cover;
+    height: 16px;
+    aspect-ratio: 1;
+    transition: transform 0.3s;
+    margin-left: auto;
+  }
+  nav[data-bimNav] .firstDepthSubNav{
+    padding-left: 20px;
+  }
+  nav[data-bimNav] .firstDepthSubNav a{
+    padding-inline: 10px 20px;
+  }
+  nav[data-bimNav] .nthDepthSubNav{
+    padding-left: 10px;
   }
 }
