@@ -1,84 +1,97 @@
-div[data-pagination-wrapper]{
+[data-bimSlider]{
+
+}
+[data-bimSlider] .paginationWrapper{
   display: flex;
   flex-direction: column;
   gap: 10px;
   height: fit-content;
 }
-
-div[data-arrow-wrapper]{
-  position: relative;
-  height: fit-content;
-}
-div[data-arrow-wrapper] [data-next-arrow]{
-  position: absolute;
-  bottom: 50%;
-  right: 0px;
-  width: 15px;
-  transform: translate(100%, 50%);
-  cursor: pointer;
-}
-div[data-arrow-wrapper] [data-prev-arrow]{
-  position: absolute;
-  bottom: 50%;
-  left: 0px;
-  width: 15px;
-  transform: translate(-100%, 50%);
-  cursor: pointer;
-}
-
-div[data-list-wrapper]{
-  height: fit-content;
-  padding-inline: 1px;
-}
-
-ul[data-card-list]{
-  display: flex;
-  user-select: none;
-}
-ul[data-card-list] li[data-card-item]{
-  display: flex;
-  aspect-ratio: 3 / 2;
-  border: 1px solid black;
-}
-ul[data-card-list] li[data-card-item] img{
-  object-fit: cover;
-  width: 100%;
-  height: 100%;
-  user-select: none;
-}
-
-div[data-pagination-cont]{
+[data-bimSlider] .paginationCont{
   align-self: center;
 }
-ul[data-pagination-ul]{
+[data-bimSlider] [data-pagination-ul]{
   display: flex;
-  gap: 8px;
+  gap: 4px;
 }
-ul[data-pagination-ul] li[data-li-page]{
+[data-bimSlider] [data-pagination-ul] li{
+  display: flex;
+}
+[data-bimSlider] [data-pagination-ul] button{
   background: hsl(222, 5%, 65%);
   color: hsl(0, 0%, 20%);
   aspect-ratio: 1;
   cursor: pointer;
 }
-ul[data-pagination-ul=dots] li[data-li-page]{
+[data-bimSlider] [data-pagination-ul=dots] button{
   height: 12px;
   border-radius: 50%;
 }
-ul[data-pagination-ul=numbers] li[data-li-page]{
+[data-bimSlider] [data-pagination-ul=numbers] button{
   font-size: 14px;
   font-weight: 600;
   display: flex;
   align-items: center;
   justify-content: center;
-  height: 32px;
+  height: clamp(28px, 3.7vw, 32px);
   line-height: 100%;
   border-radius: 4px;
 }
-ul[data-pagination-ul] li[data-li-page]:hover{
+[data-bimSlider] [data-pagination-ul] button:hover{
   background: hsl(222, 5%, 50%);
   color: hsl(0, 0%, 95%);
 }
-ul[data-pagination-ul] li[data-li-page][data-current-page=true]{
+[data-bimSlider] [data-pagination-ul] button[data-current-page=true]{
   background: hsl(222, 5%, 25%);
   color: hsl(0, 0%, 95%);
+}
+
+[data-bimSlider] .arrowWrapper{
+  position: relative;
+  height: fit-content;
+}
+[data-bimSlider] .arrowWrapper .nextBtn{
+  right: 0px;
+  transform: translate(100%, 50%);
+}
+[data-bimSlider] .arrowWrapper .prevBtn{
+  left: 0px;
+  transform: translate(-100%, 50%);
+}
+[data-bimSlider] .arrowWrapper .nextBtn,
+[data-bimSlider] .arrowWrapper .prevBtn{
+  position: absolute;
+  bottom: 50%;
+  display: flex;
+  cursor: pointer;
+}
+[data-bimSlider] .arrowWrapper .nextBtn svg,
+[data-bimSlider] .arrowWrapper .prevBtn svg{
+  height: 25px;
+}
+
+[data-bimSlider] .listWrapper{
+  height: fit-content;
+  padding-inline: 1px;
+}
+[data-bimSlider] .listWrapper ul{
+  display: flex;
+  user-select: none;
+  gap: 20px;
+}
+[data-bimSlider] .listWrapper ul .cardItem{
+  display: flex;
+  aspect-ratio: 3 / 2;
+  border: 1px solid black;
+}
+[data-bimSlider] .listWrapper ul .cardItem img{
+  object-fit: cover;
+  width: 100%;
+  height: 100%;
+  user-select: none;
+}
+@media(max-width: 720px){
+  [data-bimSlider] .listWrapper ul{
+    gap: 10px;
+  }
 }

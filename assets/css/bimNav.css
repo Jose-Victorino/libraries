@@ -19,6 +19,10 @@ nav[data-bimNav] .start{
 }
 nav[data-bimNav] .logoCont{
   display: flex;
+  height: 100%;
+}
+nav[data-bimNav] .logoCont a{
+  display: inline-flex;
   align-items: center;
   gap: 8px;
   height: 100%;
@@ -108,13 +112,6 @@ nav[data-bimNav] .hasSubNav ul{
   nav[data-bimNav]{
     padding-inline: 18px;
   }
-  nav[data-bimNav] .logoCont{
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    height: 100%;
-    padding-block: 10px;
-  }
   nav[data-bimNav] .logoCont .logoTxt{
     display: none;
   }
@@ -150,10 +147,15 @@ nav[data-bimNav] .hasSubNav ul{
   nav[data-bimNav] .end.show{
     right: 0;
   }
-  nav[data-bimNav] li{
+  nav[data-bimNav] ul.navLinks{
+    flex-direction: column;
+    gap: 0;
+    height: auto;
+  }
+  nav[data-bimNav] ul.navLinks li{
     display: flex;
   }
-  nav[data-bimNav] a{
+  nav[data-bimNav] ul.navLinks a{
     white-space: wrap;
     line-height: 1.2;
     align-items: center;
@@ -161,19 +163,17 @@ nav[data-bimNav] .hasSubNav ul{
     width: 100%;
     padding: 15px 20px;
   }
-  nav[data-bimNav] ul.navLinks{
-    flex-direction: column;
-    gap: 0;
-    height: auto;
-  }
   nav[data-bimNav] ul.navLinks ul{
     position: static;
   }
-  nav[data-bimNav] .hasSubNav{
+  nav[data-bimNav] ul.navLinks .hasSubNav{
     display: grid;
     grid-template-rows: max-content 0fr;
     position: static;
     transition: grid-template-rows 0.3s ease-out;
+  }
+  nav[data-bimNav] ul.navLinks .hasSubNav.show{
+    grid-template-rows: max-content 1fr;
   }
   nav[data-bimNav] .hasSubNav ul{
     display: flex;
@@ -183,9 +183,6 @@ nav[data-bimNav] .hasSubNav ul{
   }
   nav[data-bimNav] .hasSubNav li{
     border-left: 1px solid hsl(0, 0%, 0%, 0.2);
-  }
-  nav[data-bimNav] .hasSubNav.show{
-    grid-template-rows: max-content 1fr;
   }
   nav[data-bimNav] .hasSubNav.show > a::after{
     transform: rotateZ(180deg);

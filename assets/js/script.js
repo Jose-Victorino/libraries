@@ -67,13 +67,12 @@ new bimSlider(sliderUl, {
   scrollable: true,
   perPage: 3,
   perMove: 1,
-  gap: 15,
-  pagination: 'numbers',
+  // pagination: 'numbers',
+  pagination: 'dots',
   breakpoints: {
     940: {
       perPage: 2,
       perMove: 2,
-      gap: 10,
     },
     560: {
       perPage: 1,
