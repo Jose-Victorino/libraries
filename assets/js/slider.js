@@ -3,9 +3,6 @@ const bimSlider = (() => {
    * @typedef {'chevron' | 'angle' | 'caret' | 'circled' | 'arrow thin' | 'arrow solid'} ArrowType
    * @typedef {'normal' | 'loop' | 'auto-scroll'} SliderType 
    * @typedef {'numbers' | 'dots'} PaginationType
-   * @typedef {Object} Breakpoints
-   * @property {number} perPage
-   * @property {number} perMove
    * 
    * @typedef {Object} Data
    * @property {SliderType} type
@@ -15,11 +12,9 @@ const bimSlider = (() => {
    * @property {Boolean} draggable
    * @property {Boolean} scrollable
    * @property {Number} perPage
-   * @property {Number} perMove
    * @property {Number} gap
    * @property {Number} interval
    * @property {PaginationType} pagination
-   * @property {Breakpoints} breakpoints
    */
   /** @type {HTMLDivElement} */     let sliderWrapper;
   /** @type {HTMLDivElement} */     let paginationWrapper;
@@ -41,8 +36,8 @@ const bimSlider = (() => {
   /** @type {Number} */             let translateVal = 0;
 
   /**
-   * revamp per move 
-   * card.setAttribute('aria-hidden', 'true');delay
+   * card.setAttribute('aria-hidden', 'true');
+   * more aria attr
    */
   
   const svgArrows = {
@@ -77,8 +72,6 @@ const bimSlider = (() => {
     
     switch(sliderData.type){
       case 'loop':
-        if(sliderData.perMove >= cards.length)
-          throw new Error(`PerMove must be less than the number of cards when type = 'loop'`);
       break;
       case 'auto-scroll':
         Object.assign(sliderData, {
@@ -101,7 +94,6 @@ const bimSlider = (() => {
     validate(sliderData.arrowType, 'string', val => ['chevron', 'angle', 'caret', 'circled', 'arrow thin', 'arrow solid'].includes(val));
     validate(sliderData.draggable, 'boolean');
     validate(sliderData.perPage, 'number', val => val > 0);
-    validate(sliderData.perMove, 'number', val => val > 0);
     validate(sliderData.scrollable, 'boolean');
     validate(sliderData.interval, 'number', val => val >= 100);
     validate(sliderData.gap, 'number', val => val > 0);
@@ -110,19 +102,6 @@ const bimSlider = (() => {
       validate(sliderData.pagination, 'string', val => ['numbers', 'dots'].includes(val));
     else if(typeof sliderData.pagination !== 'boolean')
       throw new Error(`Invalid data format 'pagination'`);
-    
-    Object.entries(sliderData.breakpoints).forEach(([bpVal, values]) => {
-      if(isNaN(bpVal) || bpVal <= 0)
-        throw new Error('All breakpoint values must be a positive number.');
-      
-      if(Object.values(values).some(v => isNaN(v) || v <= 0))
-        throw new Error(`Invalid value inside ${bpVal} breakpoint. Value must be a positive number.`);
-    });
-    sliderData.breakpoints[10000] = {
-      perPage: sliderData.perPage,
-      perMove: sliderData.perMove,
-      gap: sliderData.gap,
-    };
   };
   const initElements = () => {
     sliderWrapper = document.createElement('div');
@@ -186,7 +165,7 @@ const bimSlider = (() => {
         if(sliderData.pagination === 'numbers')
           btn.innerText = i + 1;
 
-        btn.dataset.buttonNumber = i + 1
+        btn.dataset.buttonNumber = i + 1;
 
         li.append(btn);
         paginationUl.append(li);
@@ -251,20 +230,32 @@ const bimSlider = (() => {
       velocity = 0;
 
       if(isDragging && dragVal){
-        let translatedNum = [], closestCard;
-
+        let closestCard;
+        const maxJump = Math.ceil(maxCards / sliderData.perPage);
+        const jumpValues = Array.from({ length: maxJump }, (_, i) => 
+          Math.min(sliderData.perPage * i, endCard - 1)
+        );
+        
         switch(sliderData.type){
           case 'normal':
-            for(let i = 0; i < endCard; i++)
-              translatedNum.push(Math.abs(i * cardWidth - dragVal));
-            closestCard = translatedNum.indexOf(Math.min(...translatedNum));
+            closestCard = jumpValues
+            .reduce((closest, jumpVal) => 
+              Math.abs(jumpVal * cardWidth - dragVal) < Math.abs(closest * cardWidth - dragVal) 
+              ? jumpVal : closest
+            );
+            
             currentSlide = closestCard + 1;
             translateVal = closestCard * cardWidth;
           break;
           case 'loop':
-            for(let i = 0; i < cards.length; i++)
-              translatedNum.push(Math.abs(i * cardWidth - (dragVal + translateStart)));
-            closestCard = translatedNum.indexOf(Math.min(...translatedNum));
+            closestCard = Array.from(cards)
+            .map((_, i) => i)
+            .filter(i => jumpValues.includes(i % maxCards))
+            .reduce((closest, i) => 
+              Math.abs(i * cardWidth - (dragVal + translateStart)) < Math.abs(closest * cardWidth - (dragVal + translateStart)) 
+              ? i : closest
+            );
+      
             currentSlide = (closestCard % maxCards) + 1;
             translateVal = (closestCard * cardWidth) - translateStart;
           break;
@@ -276,13 +267,13 @@ const bimSlider = (() => {
     };
     if(sliderData.type === 'auto-scroll') handleAutoScroll();
     else{
-      parentEl.addEventListener('touchstart', pressStart);
-      parentEl.addEventListener('touchmove', pressMove);
+      listWrapper.addEventListener('touchstart', pressStart);
+      listWrapper.addEventListener('touchmove', pressMove);
       document.addEventListener('touchend', pressEnd);
     }
     if(sliderData.draggable){
-      parentEl.addEventListener('mousedown', pressStart);
-      parentEl.addEventListener('mousemove', pressMove);
+      listWrapper.addEventListener('mousedown', pressStart);
+      listWrapper.addEventListener('mousemove', pressMove);
       document.addEventListener('mouseup', pressEnd);
     }
     if(sliderData.arrows) handleArrowEvent();
@@ -290,6 +281,30 @@ const bimSlider = (() => {
     if(sliderData.pagination) handlePageEvent();
   };
   const handleResponsive = () => {
+    const breakpointsHandler = () => {
+      sliderData.gap = 20;
+      sliderData.perPage = 3;
+
+      if(window.matchMedia('(max-width: 920px)').matches){
+        sliderData.perPage = 2;
+      }
+      if(window.matchMedia('(max-width: 680px)').matches){
+        sliderData.gap = 10;
+      }
+      if(window.matchMedia('(max-width: 560px)').matches){
+        sliderData.perPage = 1;
+      }
+      
+      endCard = maxCards - (sliderData.perPage - 1);
+
+      if(sliderData.type === 'normal' && sliderData.arrows){
+        nextBtn.style.opacity = currentSlide === endCard ? '0.3' : '1';
+        prevBtn.style.opacity = currentSlide === 1 ? '0.3' : '1';
+      }
+      for(const card of cards){
+        card.style.minWidth = `calc((100% - ${sliderData.gap * (sliderData.perPage - 1)}px) / ${sliderData.perPage})`;
+      }
+    };
     const updateSliderConfig = () => {
       cardWidth = cards[0].getBoundingClientRect().width + sliderData.gap;
       translateVal = cardWidth * (currentSlide - 1);
@@ -297,24 +312,28 @@ const bimSlider = (() => {
       switch(sliderData.type){
         case 'normal':
           parentEl.style.transform = `translateX(-${translateVal}px)`;
-          const currentEndCard = maxCards - (sliderData.perPage - 1);
           
-          if(currentSlide > currentEndCard)
-            currentSlide = currentEndCard;
+          if(currentSlide > endCard)
+            currentSlide = endCard;
           
           if(sliderData.arrows){
-            nextBtn.style.opacity = currentSlide === currentEndCard ? '0.3' : '1';
+            nextBtn.style.opacity = currentSlide === endCard ? '0.3' : '1';
             prevBtn.style.opacity = currentSlide === 1 ? '0.3' : '1';
           }
           if(sliderData.pagination){
             for(let i = 0; i < pages.length; i++){
-              pages[i].style.display = i < currentEndCard ? 'flex' : 'none';
+              pages[i].style.display = i < Math.ceil(maxCards / sliderData.perPage) ? 'flex' : 'none';
             }
             updatePagination();
           }
-          endCard = currentEndCard;
         break;
         case 'loop':
+          if(sliderData.pagination){
+            for(let i = 0; i < pages.length; i++){
+              pages[i].style.display = i < Math.ceil(maxCards / sliderData.perPage) ? 'flex' : 'none';
+            }
+            updatePagination();
+          }
           translateStart = cardWidth * (cards.length / 3);
     
           parentEl.style.transform = `translateX(-${translateStart + translateVal}px)`;
@@ -324,29 +343,6 @@ const bimSlider = (() => {
     
           parentEl.style.transform = `translateX(-${translateStart + translateVal}px)`;
         break;
-      }
-    };
-    const breakpointsHandler = () => {
-      const closestBpVal = Object.keys(sliderData.breakpoints).filter(bp => bp >= window.innerWidth).sort((a, b) => a - b)[0] ?? null;
-      
-      sliderData.gap = window.matchMedia('(max-width: 720px)').matches ? 10 : 20;
-      
-      if(closestBpVal !== null){
-        const {perPage, perMove} = sliderData.breakpoints[closestBpVal];
-
-        Object.assign(sliderData, {
-          perPage: perPage ?? sliderData.perPage,
-          perMove: perMove ?? sliderData.perMove,
-        });
-        
-        if(sliderData.type === 'normal' && sliderData.arrows){
-          nextBtn.style.opacity = currentSlide === endCard ? '0.3' : '1';
-          prevBtn.style.opacity = currentSlide === 1 ? '0.3' : '1';
-        }
-        
-        for(const card of cards){
-          card.style.minWidth = `calc((100% - ${sliderData.gap * (sliderData.perPage - 1)}px) / ${sliderData.perPage})`;
-        }
       }
     };
     window.addEventListener('resize', () => {
@@ -413,36 +409,60 @@ const bimSlider = (() => {
     });
   };
   const updatePagination = () => {
+    let selectedBtn = Array.from(pages)
+    .reduce((selected, _, i) => {
+      let jump = sliderData.perPage * i + 1;
+      
+      if(jump > maxCards) return selected;
+      if(jump === maxCards) jump -= sliderData.perPage - 1;
+      return (jump <= currentSlide) ? i : selected;
+    }, 0);
+    
     for(let i = 0; i < pages.length; i++){
       const btn = pages[i].querySelector('button');
-      btn.dataset.currentPage = i === currentSlide - 1 ? 'true' : 'false';
+      btn.dataset.currentPage = i === selectedBtn ? 'true' : 'false';
     }
   };
 
+  const updateValues = (currentCard, dir) => {
+    switch(sliderData.type){
+      case 'normal':
+        if(currentSlide > endCard){
+          currentSlide = endCard;
+          translateVal = cardWidth * (endCard - 1);
+        }
+        else if(currentSlide < 1){
+          currentSlide = 1;
+          translateVal = 0;
+        }
+      break;
+      case 'loop':
+        if(currentCard === endCard && dir > 0){
+          currentSlide = currentSlide % maxCards || maxCards;
+          break;
+        }
+        else if(currentCard === 1 && dir < 0){
+          currentSlide += maxCards;
+          break;
+        }
+        if(currentSlide > endCard){
+          currentSlide = endCard;
+          translateVal = cardWidth * (endCard - 1);
+        }
+        else if(currentSlide < 1){
+          currentSlide = 1;
+          translateVal = 0;
+        }
+      break;
+    }
+  };
   const handleArrowEvent = () => {
     const arrowPressed = (dir) => {
-      currentSlide += dir * sliderData.perMove;
-      translateVal += dir * cardWidth * sliderData.perMove;
-
-      switch(sliderData.type){
-        case 'normal':
-          if(currentSlide > endCard){
-            currentSlide = endCard;
-            translateVal = cardWidth * (endCard - 1);
-          }
-          else if(currentSlide < 1){ 
-            currentSlide = 1;
-            translateVal = 0;
-          }
-        break;
-        case 'loop':
-          if(currentSlide < 1)
-            currentSlide += maxCards;
-          else if(currentSlide > maxCards)
-            currentSlide -= maxCards;
-        break;
-      }
-
+      const currentCard = translateVal / cardWidth + 1;
+      currentSlide += dir * sliderData.perPage;
+      translateVal += dir * cardWidth * sliderData.perPage;
+      
+      updateValues(currentCard, dir);
       translateSlider(300);
       if(sliderData.pagination) updatePagination();
     };
@@ -450,38 +470,25 @@ const bimSlider = (() => {
     prevBtn.addEventListener('click', () => {arrowPressed(-1)});
   };
   const handleScrollEvent = () => {
-    const handleScroll = (e) => {
+    listWrapper.addEventListener('wheel', (e) => {
       e.preventDefault();
+      const dir = (e.wheelDelta < 0 ? 1 : -1) * sliderData.perPage;
+      const currentCard = translateVal / cardWidth + 1;
+      currentSlide = (currentCard % maxCards || maxCards) + dir;
+      translateVal = (currentCard - 1 + dir) * cardWidth;
 
-      switch(sliderData.type){
-        case 'normal':
-          if(e.wheelDelta < 0 && currentSlide < endCard)
-            currentSlide++;
-          else if(e.wheelDelta > 0 && currentSlide > 1)
-            currentSlide--;
-
-          translateVal = cardWidth * (currentSlide - 1);
-        break;
-        case 'loop':
-          let direction = e.wheelDelta < 0 ? 1 : -1;
-          let currentCard = (translateVal + translateStart) / cardWidth + 1 + direction;
-          
-          currentSlide = currentCard % maxCards || maxCards;
-          translateVal = (currentCard - 1) * cardWidth - translateStart;
-        break;
-      }
-
+      updateValues(currentCard, dir);
       translateSlider(180);
       if(sliderData.pagination) updatePagination();
-    };
-    parentEl.addEventListener('wheel', handleScroll);
+    });
   };
   const handlePageEvent = () => {
-    const handlePageClick = (e) => {
+    paginationUl.addEventListener('click', (e) => {
       const target = e.target.closest('button');
       if(!target || target.dataset.currentPage === 'true') return;
       
-      currentSlide = target.dataset.buttonNumber;
+      const jump = sliderData.perPage * (target.dataset.buttonNumber - 1) + 1;
+      currentSlide = jump > endCard ? endCard : jump;
       
       switch(sliderData.type){
         case 'loop':
@@ -512,8 +519,7 @@ const bimSlider = (() => {
       
       translateSlider(300);
       if(sliderData.pagination) updatePagination();
-    };
-    paginationUl.addEventListener('click', handlePageClick);
+    });
   };
   const handleAutoScroll = async () => {
     await delay(sliderData.interval);
@@ -539,11 +545,9 @@ const bimSlider = (() => {
         draggable: data.draggable ?? false,
         scrollable: data.scrollable ?? false,
         perPage: data.perPage ?? 3,
-        perMove: data.perMove ?? 1,
         gap: 20,
         pagination: data.pagination ?? false,
         interval: data.interval ?? 3000,
-        breakpoints: data.breakpoints ?? {},
       };
 
       validation();
