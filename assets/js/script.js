@@ -14,37 +14,37 @@ pnSettings = {
   },
   confirm: {},
 };
-Array.from(document.querySelector('.pushN').children).forEach(pn => {
-  const funcName = pn.classList.toString();
+// Array.from(document.querySelector('.pushN').children).forEach(pn => {
+//   const funcName = pn.classList.toString();
   
-  Array.from(pn.querySelectorAll('.property')).forEach(property => {
-    const name = property.querySelector('p').innerText;
-    const ull = property.querySelector('ul');
-    ull.addEventListener('click', e => {
-      const target = e.target.closest('li');
-      if(!target) return;
+//   Array.from(pn.querySelectorAll('.property')).forEach(property => {
+//     const name = property.querySelector('p').innerText;
+//     const ull = property.querySelector('ul');
+//     ull.addEventListener('click', e => {
+//       const target = e.target.closest('li');
+//       if(!target) return;
 
-      const value = target.innerText;
+//       const value = target.innerText;
       
-      pnSettings[funcName][name] = (pnSettings[funcName][name] === value) ? null : value;
+//       pnSettings[funcName][name] = (pnSettings[funcName][name] === value) ? null : value;
       
-      const pasteDiv = pn.querySelector(`.paste${name}`);
-      if(pnSettings[funcName][name] === null){
-        pasteDiv.innerHTML = '';
-        return;
-      }
-      else if(pn.classList.contains('input') && value === 'option'){
-        pasteDiv.innerHTML = `<br>  <span class="lblue">${name}:</span> <span class="orange">'${value}'</span>,<br>  <span class="lblue">options:</span> <span class="dblue">[</span><span class="mint">1</span>, <span class="mint">2</span>, <span class="mint">3</span><span class="dblue">]</span>,`;
-      }
-      else if(['true', 'false'].includes(value)){
-        pasteDiv.innerHTML = `<br>  <span class="lblue">${name}:</span> <span class="dblue">${value}</span>,`;
-      }
-      else{
-        pasteDiv.innerHTML = `<br>  <span class="lblue">${name}:</span> <span class="orange">'${value}'</span>,`;
-      }
-    });
-  });
-});
+//       const pasteDiv = pn.querySelector(`.paste${name}`);
+//       if(pnSettings[funcName][name] === null){
+//         pasteDiv.innerHTML = '';
+//         return;
+//       }
+//       else if(pn.classList.contains('input') && value === 'option'){
+//         pasteDiv.innerHTML = `<br>  <span class="lblue">${name}:</span> <span class="orange">'${value}'</span>,<br>  <span class="lblue">options:</span> <span class="dblue">[</span><span class="mint">1</span>, <span class="mint">2</span>, <span class="mint">3</span><span class="dblue">]</span>,`;
+//       }
+//       else if(['true', 'false'].includes(value)){
+//         pasteDiv.innerHTML = `<br>  <span class="lblue">${name}:</span> <span class="dblue">${value}</span>,`;
+//       }
+//       else{
+//         pasteDiv.innerHTML = `<br>  <span class="lblue">${name}:</span> <span class="orange">'${value}'</span>,`;
+//       }
+//     });
+//   });
+// });
 function runCode(type){
   let codeContent = document.querySelector(`.pushN .${type} pre code`).textContent;
 
@@ -65,8 +65,13 @@ new bimSlider(sliderUl, {
   // spanWidth: true,
   draggable: true,
   scrollable: true,
+<<<<<<< HEAD
   pagination: 'dots',
   pagination: 'numbers',
+=======
+  pagination: 'numbers',
+  // pagination: 'dots',
+>>>>>>> 8cb68cfbc63bec6678758f098a759bc5f7633234
 });
 
 const bc = document.getElementById('breadcrumbs-list');
