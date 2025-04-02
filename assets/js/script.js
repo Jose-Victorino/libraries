@@ -58,27 +58,15 @@ function runCode(type){
 
 const sliderUl = document.querySelector('.cardList');
 new bimSlider(sliderUl, {
-  // type: 'normal',
+  type: 'normal',
   type: 'loop',
   // type: 'auto-scroll',
   arrows: true,
   // spanWidth: true,
   draggable: true,
   scrollable: true,
-  perPage: 3,
-  perMove: 1,
-  // pagination: 'numbers',
   pagination: 'dots',
-  breakpoints: {
-    940: {
-      perPage: 2,
-      perMove: 2,
-    },
-    560: {
-      perPage: 1,
-      perMove: 1,
-    },
-  },
+  pagination: 'numbers',
 });
 
 const bc = document.getElementById('breadcrumbs-list');
