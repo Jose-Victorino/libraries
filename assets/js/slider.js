@@ -14,7 +14,6 @@ const bimSlider = (() => {
    * @property {PaginationType} pagination
    * @property {Number} interval
    */
-<<<<<<< HEAD
   /** @type {HTMLDivElement} */     let sliderWrapper;
   /** @type {HTMLDivElement} */     let paginationWrapper;
   /** @type {HTMLDivElement} */     let arrowWrapper;
@@ -34,27 +33,6 @@ const bimSlider = (() => {
   /** @type {Number} */             let endCard;
   /** @type {Array<Number>} */      let testVals;
   /** @type {Number} */             let activeCard = 0;
-=======
-  /** @type {HTMLDivElement} */     let sliderWrapper,
-  /** @type {HTMLDivElement} */         paginationWrapper,
-  /** @type {HTMLDivElement} */         arrowWrapper,
-  /** @type {HTMLDivElement} */         listWrapper,
-  /** @type {HTMLButtonElement} */      nextBtn,
-  /** @type {HTMLButtonElement} */      prevBtn,
-  /** @type {HTMLDivElement} */         paginationCont,
-  /** @type {HTMLUListElement} */       paginationUl,
-  /** @type {HTMLElement} */            parentEl,
-  /** @type {HTMLCollection} */         cards,
-  /** @type {Number} */                 maxCards,
-  /** @type {HTMLCollection} */         pages,
-  /** @type {Data} */                   sliderData = {},
-  /** @type {Number} */                 cardWidth,
-  /** @type {Number} */                 gap,
-  /** @type {Number} */                 perPage,
-  /** @type {Number} */                 endCard,
-  /** @type {Array<Number>} */          testVals,
-  /** @type {Number} */                 activeCard = 0;
->>>>>>> 8cb68cfbc63bec6678758f098a759bc5f7633234
   
   const svgArrows = {
     'chevron': {
@@ -448,12 +426,9 @@ const bimSlider = (() => {
 
           parentEl.style.transform = `translateX(-${translateVal}px)`;
         break;
-<<<<<<< HEAD
         case 'loop':
           parentEl.style.transform = `translateX(-${dragVal}px)`;
         break;
-=======
->>>>>>> 8cb68cfbc63bec6678758f098a759bc5f7633234
       }
     };
     const pressEnd = () => {
@@ -463,13 +438,6 @@ const bimSlider = (() => {
         let closestCard, reduceJumpVals;
         const maxJump = Math.ceil(maxCards / perPage);
         const jumpValues = Array.from({ length: maxJump }, (_, i) => Math.min(perPage * i, endCard - 1));
-<<<<<<< HEAD
-        
-        reduceJumpVals = testVals.reduce((acc, cur, i) => {
-          if(jumpValues.includes(i % maxCards)) acc[i] = cur;
-          return acc;
-        }, {});
-=======
         const getReducedJumpVals = (values) => {
           return values.reduce((acc, cur, i) => {
             if(jumpValues.includes(i % maxCards)) acc[i] = cur;
@@ -492,7 +460,6 @@ const bimSlider = (() => {
             reduceJumpVals = getReducedJumpVals(vals);
           break;
         }
->>>>>>> 8cb68cfbc63bec6678758f098a759bc5f7633234
         
         closestCard = Object.entries(reduceJumpVals).reduce((prev, [i, transVal]) =>
           Math.abs(transVal - dragVal) < Math.abs(prev[1] - dragVal) ? [i, transVal] : prev
