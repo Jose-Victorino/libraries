@@ -65,13 +65,8 @@ new bimSlider(sliderUl, {
   // spanWidth: true,
   draggable: true,
   scrollable: true,
-<<<<<<< HEAD
   pagination: 'dots',
   pagination: 'numbers',
-=======
-  pagination: 'numbers',
-  // pagination: 'dots',
->>>>>>> 8cb68cfbc63bec6678758f098a759bc5f7633234
 });
 
 const bc = document.getElementById('breadcrumbs-list');
