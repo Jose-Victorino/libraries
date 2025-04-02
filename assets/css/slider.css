@@ -12,7 +12,7 @@
 }
 [data-bimSlider] [data-pagination-ul]{
   display: flex;
-  gap: 4px;
+  gap: 6px;
 }
 [data-bimSlider] [data-pagination-ul] li{
   display: flex;
@@ -28,12 +28,12 @@
   border-radius: 50%;
 }
 [data-bimSlider] [data-pagination-ul=numbers] button{
-  font-size: 14px;
+  font-size: 12px;
   font-weight: 600;
   display: flex;
   align-items: center;
   justify-content: center;
-  height: clamp(28px, 3.7vw, 32px);
+  height: clamp(24px, 3.7vw, 28px);
   line-height: 100%;
   border-radius: 4px;
 }
@@ -67,7 +67,7 @@
 }
 [data-bimSlider] .arrowWrapper .nextBtn svg,
 [data-bimSlider] .arrowWrapper .prevBtn svg{
-  height: 25px;
+  width: 15px;
 }
 
 [data-bimSlider] .listWrapper{
@@ -93,5 +93,9 @@
 @media(max-width: 680px){
   [data-bimSlider]{
     --gap: 10px;
+  }
+  [data-bimSlider] .arrowWrapper .nextBtn svg,
+  [data-bimSlider] .arrowWrapper .prevBtn svg{
+    width: 12px;
   }
 }
