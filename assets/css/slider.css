@@ -1,33 +1,40 @@
-[data-bimSlider]{
-  --gap: 20px;
+.bimSlider{
+  --gap: 14px;
 }
-[data-bimSlider] .paginationWrapper{
+.bimSlider:has([data-pagination-ul="numbers"]){
+  padding-bottom: calc(10px + clamp(24px, 3.7vw, 28px));
+}
+.bimSlider:has([data-pagination-ul="dots"]){
+  padding-bottom: 22px;
+}
+.bimSlider .paginationWrapper{
+  position: relative;
   display: flex;
   flex-direction: column;
-  gap: 10px;
   height: fit-content;
 }
-[data-bimSlider] .paginationCont{
-  align-self: center;
-}
-[data-bimSlider] [data-pagination-ul]{
+.bimSlider [data-pagination-ul]{
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 50%;
   display: flex;
   gap: 6px;
+  transform: translateX(50%);
 }
-[data-bimSlider] [data-pagination-ul] li{
+.bimSlider [data-pagination-ul] li{
   display: flex;
 }
-[data-bimSlider] [data-pagination-ul] button{
+.bimSlider [data-pagination-ul] button{
   background: hsl(222, 5%, 65%);
   color: hsl(0, 0%, 20%);
   aspect-ratio: 1;
   cursor: pointer;
 }
-[data-bimSlider] [data-pagination-ul=dots] button{
+.bimSlider [data-pagination-ul=dots] button{
   height: 12px;
   border-radius: 50%;
 }
-[data-bimSlider] [data-pagination-ul=numbers] button{
+.bimSlider [data-pagination-ul=numbers] button{
   font-size: 12px;
   font-weight: 600;
   display: flex;
@@ -37,65 +44,61 @@
   line-height: 100%;
   border-radius: 4px;
 }
-[data-bimSlider] [data-pagination-ul] button:hover{
+.bimSlider [data-pagination-ul] button:hover{
   background: hsl(222, 5%, 50%);
   color: hsl(0, 0%, 95%);
 }
-[data-bimSlider] [data-pagination-ul] button[data-current-page=true]{
+.bimSlider [data-pagination-ul] button[data-current-page=true]{
   background: hsl(222, 5%, 25%);
   color: hsl(0, 0%, 95%);
 }
 
-[data-bimSlider] .arrowWrapper{
-  position: relative;
-  height: fit-content;
-}
-[data-bimSlider] .arrowWrapper .nextBtn{
+.bimSlider .arrowWrapper .nextBtn{
   right: 0px;
   transform: translate(100%, 50%);
 }
-[data-bimSlider] .arrowWrapper .prevBtn{
+.bimSlider .arrowWrapper .prevBtn{
   left: 0px;
   transform: translate(-100%, 50%);
 }
-[data-bimSlider] .arrowWrapper .nextBtn,
-[data-bimSlider] .arrowWrapper .prevBtn{
+.bimSlider .arrowWrapper .nextBtn,
+.bimSlider .arrowWrapper .prevBtn{
   position: absolute;
   bottom: 50%;
   display: flex;
   cursor: pointer;
 }
-[data-bimSlider] .arrowWrapper .nextBtn svg,
-[data-bimSlider] .arrowWrapper .prevBtn svg{
+.bimSlider .arrowWrapper .nextBtn svg,
+.bimSlider .arrowWrapper .prevBtn svg{
   width: 15px;
 }
 
-[data-bimSlider] .listWrapper{
+.bimSlider .listWrapper{
   height: fit-content;
   padding-inline: 1px;
 }
-[data-bimSlider] .listWrapper ul{
+.bimSlider .listWrapper ul{
   display: flex;
   user-select: none;
   gap: var(--gap);
 }
-[data-bimSlider] .listWrapper ul .cardItem{
+.bimSlider .listWrapper ul .cardItem{
   display: flex;
   aspect-ratio: 3 / 2;
   border: 1px solid black;
 }
-[data-bimSlider] .listWrapper ul .cardItem img{
+.bimSlider .listWrapper ul .cardItem img{
   object-fit: cover;
   width: 100%;
   height: 100%;
   user-select: none;
 }
 @media(max-width: 680px){
-  [data-bimSlider]{
-    --gap: 10px;
+  .bimSlider{
+    --gap: 6px;
   }
-  [data-bimSlider] .arrowWrapper .nextBtn svg,
-  [data-bimSlider] .arrowWrapper .prevBtn svg{
+  .bimSlider .arrowWrapper .nextBtn svg,
+  .bimSlider .arrowWrapper .prevBtn svg{
     width: 12px;
   }
 }

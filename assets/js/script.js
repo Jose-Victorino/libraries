@@ -59,12 +59,14 @@ function runCode(type){
 const sliderUl = document.querySelector('.cardList');
 new bimSlider(sliderUl, {
   type: 'normal',
+  type: 'auto-scroll',
   type: 'loop',
-  // type: 'auto-scroll',
   arrows: true,
+  perMove: 3,
   // spanWidth: true,
   draggable: true,
   scrollable: true,
+  pagination: 'line',
   pagination: 'dots',
   pagination: 'numbers',
 });
