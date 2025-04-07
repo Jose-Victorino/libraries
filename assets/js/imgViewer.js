@@ -1,5 +1,7 @@
 (() => {
   const article = document.createElement('article');
+  const isMobile = navigator.userAgentData.mobile;
+
   article.setAttribute('data-bimIVM', '');
   article.style.display = 'none';
   document.body.append(article);
@@ -141,7 +143,7 @@
       });
     });
   };
-  if(!WURFL?.is_mobile){ // <script src="https://wurfl.io/wurfl.js"></script>
+  if(!isMobile){
     handleArrowHover(nextArrDiv, nextBtn, '', () => currentImg + 1 >= images.length);
     handleArrowHover(prevArrDiv, prevBtn, '-', () => currentImg < 1);
   }
