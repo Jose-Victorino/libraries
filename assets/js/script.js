@@ -57,12 +57,13 @@ function runCode(type){
 }
 
 const sliderUl = document.querySelector('.cardList');
-new bimSlider(sliderUl, {
+new BimSlider(sliderUl, {
   type: 'normal',
   type: 'auto-scroll',
   type: 'loop',
   arrows: true,
-  perMove: 3,
+  perPage: 3,
+  perMove: 2,
   // spanWidth: true,
   draggable: true,
   scrollable: true,

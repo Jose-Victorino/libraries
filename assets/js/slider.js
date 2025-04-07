@@ -1,4 +1,11 @@
-const bimSlider = (() => {
+// (function (global, factory) {
+//   typeof exports === 'object' && typeof module !== 'undefined' ?
+//   module.exports = factory() : typeof define === 'function' && define.amd ?
+//   define(factory) : (global = typeof globalThis !== 'undefined' ?
+//   globalThis : global || self, global.BimSlider = factory());
+// })
+const BimSlider = (function (){
+  // 'use strict';
   /**
    * @typedef {'chevron' | 'angle' | 'caret' | 'circled' | 'arrow thin' | 'arrow solid'} ArrowType
    * @typedef {'normal' | 'loop' | 'auto-scroll'} SliderType 
@@ -16,24 +23,7 @@ const bimSlider = (() => {
    * @property {Number} perMove
    * @property {Number} interval
    */
-  /** @type {HTMLDivElement} */     let sliderWrapper;
-  /** @type {HTMLDivElement} */     let paginationWrapper;
-  /** @type {HTMLDivElement} */     let arrowWrapper;
-  /** @type {HTMLDivElement} */     let listWrapper;
-  /** @type {HTMLButtonElement} */  let nextBtn;
-  /** @type {HTMLButtonElement} */  let prevBtn;
-  /** @type {HTMLUListElement} */   let paginationUl;
-  /** @type {HTMLElement} */        let parentEl;
-  /** @type {HTMLCollection} */     let cards;
-  /** @type {Number} */             let maxCards;
-  /** @type {HTMLCollection} */     let pages;
-  /** @type {Data} */               let sliderData = {};
-  /** @type {Number} */             let cardWidth;
-  /** @type {Number} */             let gap;
-  /** @type {Number} */             let endCard;
-  /** @type {Array<Number>} */      let translateValues;
-  /** @type {Number} */             let activeIndex = 0;
-  /** @type {Boolean} */            const isMobile = navigator.userAgentData.mobile;
+  let sliderWrapper, paginationWrapper, arrowWrapper, listWrapper, nextBtn, prevBtn, paginationUl, parent, cards, maxCards, sData = {}, pages, gap, endCard, translateValues, activeIndex = 0;
 
   const svgArrows = {
     'chevron': {
@@ -62,12 +52,12 @@ const bimSlider = (() => {
     },
   };
   const validation = () => {
-    if(!(parentEl instanceof HTMLElement || parentEl instanceof Element))
-      throw new Error(`Invalid data format '${parentEl}'. Parent must be a HTMLElement`);
+    if(!(parent instanceof HTMLElement || parent instanceof Element))
+      throw new TypeError(`Invalid data format '${parent}'. Parent must be a HTMLElement`);
     
-    switch(sliderData.type){
+    switch(sData.type){
       case 'auto-scroll':
-        Object.assign(sliderData, {
+        Object.assign(sData, {
           draggable: false,
           arrows: false,
           scrollable: false,
@@ -78,24 +68,24 @@ const bimSlider = (() => {
 
     function validate(option, validType, validator = null){
       if(!(typeof option === validType && (validator ? validator(option) : true)))
-        throw new Error(`Invalid value for option: ${option}`);
+        throw new TypeError(`Invalid value for option: ${option}`);
     }
 
-    validate(sliderData.type, 'string', val => ['normal', 'loop', 'auto-scroll'].includes(val));
-    validate(sliderData.spanWidth, 'boolean');
-    validate(sliderData.arrows, 'boolean');
-    validate(sliderData.arrowType, 'string', val => ['chevron', 'angle', 'caret', 'circled', 'arrow thin', 'arrow solid'].includes(val));
-    validate(sliderData.draggable, 'boolean');
-    validate(sliderData.scrollable, 'boolean');
-    validate(sliderData.perPage, 'number', val => val > 0);
-    validate(sliderData.perMove, 'number', val => val > 0);
-    validate(sliderData.interval, 'number', val => val >= 100);
+    validate(sData.type, 'string', val => ['normal', 'loop', 'auto-scroll'].includes(val));
+    validate(sData.spanWidth, 'boolean');
+    validate(sData.arrows, 'boolean');
+    validate(sData.arrowType, 'string', val => ['chevron', 'angle', 'caret', 'circled', 'arrow thin', 'arrow solid'].includes(val));
+    validate(sData.draggable, 'boolean');
+    validate(sData.scrollable, 'boolean');
+    validate(sData.perPage, 'number', val => val > 0);
+    validate(sData.perMove, 'number', val => val > 0);
+    validate(sData.interval, 'number', val => val >= 100);
 
-    if(sliderData.perMove > sliderData.perPage) throw new Error("perMove can't be greater than perPage");
-    if(typeof sliderData.pagination === 'string')
-      validate(sliderData.pagination, 'string', val => ['numbers', 'dots', 'line'].includes(val));
-    else if(typeof sliderData.pagination !== 'boolean')
-      throw new Error(`Invalid data format 'pagination'`);
+    if(sData.perMove > sData.perPage) throw new TypeError("perMove can't be greater than perPage");
+    if(typeof sData.pagination === 'string')
+      validate(sData.pagination, 'string', val => ['numbers', 'dots', 'line'].includes(val));
+    else if(typeof sData.pagination !== 'boolean')
+      throw new TypeError(`Invalid data format 'pagination'`);
   };
   const initElements = () => {
     sliderWrapper = document.createElement('div');
@@ -106,32 +96,31 @@ const bimSlider = (() => {
     paginationWrapper.classList.add('paginationWrapper');
     listWrapper.classList.add('listWrapper');
 
-    parentEl.replaceWith(sliderWrapper);
+    parent.replaceWith(sliderWrapper);
     sliderWrapper.append(paginationWrapper);
     paginationWrapper.append(listWrapper);
+    listWrapper.append(parent);
     
-    listWrapper.append(parentEl);
     listWrapper.id = "slider-track";
     listWrapper.ariaLive = "polite";
     listWrapper.ariaAtomic = "true";
     listWrapper.ariaBusy = "false";
     
-    parentEl.setAttribute('role','presentation');
+    parent.setAttribute('role','presentation');
 
     Array.from(cards).forEach((card, i) => {
       card.classList.add('cardItem');
       card.setAttribute('role', 'tabpanel');
       card.setAttribute('aria-roledescription', 'slide');
       card.setAttribute('aria-label', `${i + 1} of ${maxCards}`);
-      card.style.minWidth = `calc((100% - ${gap * (sliderData.perPage - 1)}px) / ${sliderData.perPage})`;
+      card.style.minWidth = `calc((100% - ${gap * (sData.perPage - 1)}px) / ${sData.perPage})`;
       card.classList.toggle('currentSlide', (i % maxCards === 0));
       card.id = `group-1-slide-${i + 1}`;
     });
 
-    listWrapper.style.overflow = sliderData.spanWidth ? '' : 'hidden';
-    endCard = maxCards - (sliderData.perPage - 1);
+    listWrapper.style.overflow = sData.spanWidth ? '' : 'hidden';
 
-    if(['loop', 'auto-scroll'].includes(sliderData.type)){
+    if(['loop', 'auto-scroll'].includes(sData.type)){
       const fragment = document.createDocumentFragment();
 
       activeIndex = maxCards;
@@ -144,26 +133,26 @@ const bimSlider = (() => {
         });
       }
       
-      parentEl.append(fragment);
+      parent.append(fragment);
     }
-    if(sliderData.pagination){
+    if(sData.pagination){
       paginationUl = document.createElement('ul');
-      paginationUl.dataset.paginationUl = sliderData.pagination;
+      paginationUl.dataset.paginationUl = sData.pagination;
       paginationUl.role = 'tablist';
       paginationUl.ariaLabel = 'Select a slide to show';
       
       paginationWrapper.append(paginationUl);
     }
-    if(sliderData.arrows){
+    if(sData.arrows){
       nextBtn = document.createElement('button');
-      nextBtn.innerHTML = svgArrows[sliderData.arrowType].next;
+      nextBtn.innerHTML = svgArrows[sData.arrowType].next;
       nextBtn.classList.add('nextBtn');
       nextBtn.type = 'button';
       nextBtn.ariaLabel = 'Next slide';
       nextBtn.setAttribute('aria-controls','slider-track');
       
       prevBtn = document.createElement('button');
-      prevBtn.innerHTML = svgArrows[sliderData.arrowType].prev;
+      prevBtn.innerHTML = svgArrows[sData.arrowType].prev;
       prevBtn.classList.add('prevBtn');
       prevBtn.type = 'button';
       prevBtn.ariaLabel = 'Previous slide';
@@ -175,36 +164,31 @@ const bimSlider = (() => {
 
       paginationWrapper.append(arrowWrapper);
       
-      if(sliderData.type === 'normal') prevBtn.style.opacity = '0.3';
+      if(sData.type === 'normal') prevBtn.style.opacity = '0.3';
     }
   };
   
   const setPaginationElements = () => {
     paginationUl.innerHTML = '';
-    for(let i = 0; i < maxCards; i++){
-      const jump = sliderData.perMove * i + 1;
-      const t = ((jump % maxCards || maxCards) > endCard ? endCard : jump) - 1;
-      if(t > endCard) break;
+    const jumpVals = [];
 
+    for(let i = 0; i < maxCards; i++){
+      const jump = sData.perMove * i + 1;
+      const t = ((jump % maxCards || maxCards) > endCard ? endCard : jump) - 1;
+      if(jumpVals.includes(t)) break;
+      jumpVals.push(t);
+    }
+    jumpVals.forEach((t, i) => {
       const li = document.createElement('li');
       const btn = document.createElement('button');
+      const visibleIds = Array.from(cards).slice(activeIndex, activeIndex + sData.perMove).map(card => card.id);
 
       li.role = 'presentation';
-      
-      let startVisibleCard = activeIndex;
-      let endVisibleCard = activeIndex + sliderData.perMove - 1;
-      let ctrlArr = [];
-
-      Array.from(cards).forEach((card, i) => {
-        if(i >= startVisibleCard && i <= endVisibleCard){
-          ctrlArr.push(card.id);
-        }
-      });
 
       btn.type = 'button';
       btn.role = 'tab';
       btn.ariaLabel = `Go to page ${t}`;
-      btn.setAttribute('aria-controls', ctrlArr.join(' '));
+      btn.setAttribute('aria-controls', visibleIds.join(' '));
       
       if(i === 0){
         btn.ariaSelected = 'true';
@@ -213,14 +197,14 @@ const bimSlider = (() => {
       else{
         btn.tabIndex = -1;
       }
-      if(sliderData.pagination === 'numbers')
+      if(sData.pagination === 'numbers')
         btn.innerText = i + 1;
 
       btn.dataset.buttonNumber = i + 1;
 
       li.append(btn);
       paginationUl.append(li);
-    }
+    });
     pages = paginationUl.children;
   };
   const breakpointsHandler = () => {
@@ -234,18 +218,18 @@ const bimSlider = (() => {
         if(qGap !== undefined) gap = qGap;
 
         if(query === '(min-width: 681px)'){
-          paginationWrapper.style.marginInline = (sliderData.arrows) ? '15px' : '';
+          paginationWrapper.style.marginInline = (sData.arrows) ? '15px' : '';
         }
         else{
-          paginationWrapper.style.marginInline = (sliderData.arrows) ? '12px' : '';
+          paginationWrapper.style.marginInline = (sData.arrows) ? '12px' : '';
         }
       }
     });
 
-    endCard = maxCards - (sliderData.perPage - 1);
+    endCard = maxCards - (sData.perPage - 1);
     
     let startVisibleCard = activeIndex;
-    let endVisibleCard = activeIndex + sliderData.perMove - 1;
+    let endVisibleCard = activeIndex + sData.perMove - 1;
 
     for(let i = 0; i < cards.length; i++){
       if(i >= startVisibleCard && i <= endVisibleCard){
@@ -256,21 +240,20 @@ const bimSlider = (() => {
       }
     }
     for(const card of cards){
-      card.style.minWidth = `calc((100% - ${gap * (sliderData.perPage - 1)}px) / ${sliderData.perPage})`;
+      card.style.minWidth = `calc((100% - ${gap * (sData.perPage - 1)}px) / ${sData.perPage})`;
     }
   };
   const updateSliderConfig = () => {
-    cardWidth = cards[0].getBoundingClientRect().width + gap;
-    translateValues = Array.from(parentEl.children).map((_, i) => i * cardWidth);
-    parentEl.style.transform = `translateX(-${translateValues[activeIndex]}px)`;
+    translateValues = Array.from(parent.children).map((_, i) => i * (cards[0].getBoundingClientRect().width + gap));
+    parent.style.transform = `translateX(-${translateValues[activeIndex]}px)`;
     
-    if(sliderData.type === 'auto-scroll') return;
+    if(sData.type === 'auto-scroll') return;
     
-    if(sliderData.type === 'normal' && sliderData.arrows){
+    if(sData.type === 'normal' && sData.arrows){
       nextBtn.style.opacity = activeIndex === endCard - 1 ? '0.3' : '1';
       prevBtn.style.opacity = activeIndex === 0 ? '0.3' : '1';
     }
-    if(sliderData.pagination){
+    if(sData.pagination){
       setPaginationElements();
       updatePagination();
     }
@@ -286,32 +269,32 @@ const bimSlider = (() => {
 
   const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
   const snapTransition = async (t, tempIndex) => {
-    parentEl.style.transition = `transform ${t}ms`;
-    parentEl.style.transform = `translateX(-${translateValues[tempIndex]}px)`;
+    parent.style.transition = `transform ${t}ms`;
+    parent.style.transform = `translateX(-${translateValues[tempIndex]}px)`;
     await delay(t);
     return false;
   };
   const translateSlider = async (t) => {
     let doAnimate = true;
 
-    if(sliderData.type === 'normal'){
+    if(sData.type === 'normal'){
       activeIndex = activeIndex > endCard - 1 ? endCard - 1 : activeIndex < 1 ? 0 : activeIndex;
       
-      if(sliderData.arrows){
+      if(sData.arrows){
         nextBtn.style.opacity = activeIndex === endCard - 1 ? '0.3' : '1';
         prevBtn.style.opacity = activeIndex === 0 ? '0.3' : '1';
       }
     }
-    else if(sliderData.type === 'loop'){
+    else if(sData.type === 'loop'){
       const maxIndex = maxCards + endCard - 1;
       
-      if(activeIndex === maxIndex + sliderData.perMove){
+      if(activeIndex === maxIndex + sData.perMove){
         doAnimate = await snapTransition(t, maxCards * 2);
         activeIndex = maxCards;
       }
-      else if(activeIndex === maxCards - sliderData.perMove){
-        doAnimate = await snapTransition(t, maxCards - sliderData.perPage);
-        activeIndex = maxCards * 2 - sliderData.perPage;
+      else if(activeIndex === maxCards - sData.perMove){
+        doAnimate = await snapTransition(t, maxCards - sData.perPage);
+        activeIndex = maxCards * 2 - sData.perPage;
       }
       if(activeIndex > maxIndex){
         activeIndex = maxIndex;
@@ -320,19 +303,16 @@ const bimSlider = (() => {
         activeIndex = maxCards;
       }
     }
-    else if(sliderData.type === 'auto-scroll'){
-      parentEl.style.transform = `translateX(-${translateValues[activeIndex]}px)`;          
+    else if(sData.type === 'auto-scroll'){
       if(activeIndex === maxCards * 2){
-        parentEl.style.transition = `transform ${t}ms`;
-        await delay(t);
+        doAnimate = await snapTransition(t, activeIndex);
         activeIndex = maxCards;
-        doAnimate = false;
       }
     }
-    parentEl.style.transform = `translateX(-${translateValues[activeIndex]}px)`;
+    parent.style.transform = `translateX(-${translateValues[activeIndex]}px)`;
 
     let startVisibleCard = activeIndex;
-    let endVisibleCard = activeIndex + sliderData.perPage - 1;
+    let endVisibleCard = activeIndex + sData.perPage - 1;
 
     for(let i = 0; i < cards.length; i++){
       if(i >= startVisibleCard && i <= endVisibleCard){
@@ -343,11 +323,11 @@ const bimSlider = (() => {
       }
     }
     
-    parentEl.style.transition = (doAnimate) ? `transform ${t}ms` : '';
+    parent.style.transition = (doAnimate) ? `transform ${t}ms` : '';
     
     listWrapper.ariaBusy = "true";
     await delay(t);
-    parentEl.style.transition = '';
+    parent.style.transition = '';
     Array.from(cards).forEach((card, i) => {
       card.classList.toggle('currentSlide', i === activeIndex);
     });
@@ -355,9 +335,8 @@ const bimSlider = (() => {
   };
   const updatePagination = () => {
     let selectedBtn = Array.from(pages)
-    .reduce((selected, el, i) => {
-      if(el.style.display === 'none') return selected;
-      let jump = sliderData.perMove * i + 1;
+    .reduce((selected, _, i) => {
+      let jump = sData.perMove * i + 1;
       return (jump > endCard ? endCard : jump) - 1 <= (activeIndex % maxCards) ? i : selected;
     }, 0);
     
@@ -368,12 +347,12 @@ const bimSlider = (() => {
   };
   const updateElements = (t) => {
     translateSlider(t);
-    if(sliderData.pagination) updatePagination();
+    if(sData.pagination) updatePagination();
   };
 
   const handleArrowEvent = () => {
     const arrowPressed = (dir) => {
-      activeIndex += dir * sliderData.perMove;
+      activeIndex += dir * sData.perMove;
       updateElements(300);
     };
     nextBtn.addEventListener('click', () => {arrowPressed(1)});
@@ -382,7 +361,7 @@ const bimSlider = (() => {
   const handleScrollEvent = () => {
     listWrapper.addEventListener('wheel', (e) => {
       e.preventDefault();
-      activeIndex += (e.wheelDelta < 0 ? 1 : -1) * sliderData.perMove;
+      activeIndex += (e.wheelDelta < 0 ? 1 : -1) * sData.perMove;
       updateElements(180);
     });
   };
@@ -390,8 +369,8 @@ const bimSlider = (() => {
     paginationUl.addEventListener('click', (e) => {
       const target = e.target.closest('button');
       if(!target || target.dataset.currentPage === 'true') return;
-      const jump = sliderData.perMove * (target.dataset.buttonNumber - 1) + 1;
-      activeIndex = (jump > endCard ? endCard : jump) + (sliderData.type === 'loop' ? maxCards : 0) - 1;
+      const jump = sData.perMove * (target.dataset.buttonNumber - 1) + 1;
+      activeIndex = (jump > endCard ? endCard : jump) + (sData.type === 'loop' ? maxCards : 0) - 1;
       updateElements(300);
     });
   };
@@ -401,79 +380,80 @@ const bimSlider = (() => {
     let lastMouseX, velocity = 0, acceleration = 0.3;
     
     const pressStart = (e) => {
-      const pageX = e.touches?.[0].pageX || e.pageX;
       isDragging = true;
-      lastMouseX = dragStart = pageX;
+      lastMouseX = dragStart = e.touches?.[0].pageX || e.pageX;
     };
     const pressMove = (e) => {
       if(!isDragging) return;
   
-      const dragEnd = cardWidth * (endCard - 1);
+      const dragEnd = translateValues[endCard - 1];
       const pageX = e.touches?.[0].pageX || e.pageX;
       const deltaX = pageX - lastMouseX;
-  
+
       velocity += deltaX * acceleration;
       lastMouseX = pageX;
       dragVal = translateValues[activeIndex] - (pageX - dragStart) - velocity;
       
-      if(sliderData.type === 'normal'){
+      if(sData.type === 'normal'){
+        const overshoot = 500;
         if(dragVal > dragEnd){
-          dragVal = dragEnd;
-          velocity = 0;
+          const excess = dragVal - dragEnd;
+          dragVal = dragEnd + excess * acceleration * (1 - Math.min(excess / overshoot, 1));
+          velocity *= 0.7;
         }
         else if(dragVal < 0){
-          dragVal = 0;
-          velocity = 0;
+          const excess = -dragVal;
+          dragVal = excess * -acceleration * (1 - Math.min(excess / overshoot, 1));
+          velocity *= 0.7;
         }
       }
-      parentEl.style.transform = `translateX(-${dragVal}px)`;
+      parent.style.transform = `translateX(${-dragVal}px)`;
     };
     const pressEnd = () => {
-      velocity = 0;      
-  
       if(isDragging && dragVal){
-        const newClose = translateValues.reduce((acc, cur) => Math.abs(acc - dragVal) < Math.abs(cur - dragVal) ? acc : cur);
+        const closestIndex = translateValues.reduce((a, c) => Math.abs(a - dragVal) < Math.abs(c - dragVal) ? a : c);
         
-        activeIndex = translateValues.indexOf(newClose);
+        activeIndex = translateValues.indexOf(closestIndex);
         dragVal = 0;
         
         updateElements(300);
       }
+      
+      velocity = 0;
       isDragging = false;
     };
 
     listWrapper.addEventListener('mousedown', pressStart);
     listWrapper.addEventListener('mousemove', pressMove);
     document.addEventListener('mouseup', pressEnd);
-    // listWrapper.addEventListener('touchstart', pressStart);
-    // listWrapper.addEventListener('touchmove', pressMove);
-    // document.addEventListener('touchend', pressEnd);
+    listWrapper.addEventListener('touchstart', pressStart);
+    listWrapper.addEventListener('touchmove', pressMove);
+    document.addEventListener('touchend', pressEnd);
   };
   const handleAutoScroll = async () => {
-    await delay(sliderData.interval);
+    await delay(sData.interval);
     activeIndex++;
     translateSlider(300);
     handleAutoScroll();
   };
   const initEventHandlers = () => {
-    if(sliderData.arrows) handleArrowEvent();
-    if(sliderData.scrollable) handleScrollEvent();
-    if(sliderData.pagination) handlePageEvent();
-    if(sliderData.draggable) handleDragEvent();
-    if(sliderData.type === 'auto-scroll') handleAutoScroll();
+    if(sData.arrows) handleArrowEvent();
+    if(sData.scrollable) handleScrollEvent();
+    if(sData.pagination) handlePageEvent();
+    if(sData.draggable) handleDragEvent();
+    if(sData.type === 'auto-scroll') handleAutoScroll();
   };
 
   class slider{
     /**
-     * @param {HTMLElement} parent
-     * @param {Data} data
+     * @param {HTMLElement} cardList
+     * @param {Data} d
      */
-    constructor(parent, {type = 'normal', spanWidth = false, arrows = false, arrowType = 'chevron', draggable = false, scrollable = false, pagination = false, perPage = 3, perMove = 1, interval = 3000}){
-      parentEl = parent;
-      cards = parent.children;      
-      maxCards = parent.children.length;
-      gap = 20;
-      Object.assign(sliderData, {type, spanWidth, arrows, arrowType, draggable, scrollable, pagination, perPage, perMove, interval});
+    constructor(cardList, {type = 'normal', spanWidth = false, arrows = false, arrowType = 'chevron', draggable = false, scrollable = false, pagination = false, perPage = 3, perMove = 1, interval = 3000}){
+      parent = cardList;
+      cards = cardList.children;      
+      maxCards = cardList.children.length;
+      Object.assign(sData, {type, spanWidth, arrows, arrowType, draggable, scrollable, pagination, perPage, perMove, interval});
 
       validation();
       initElements();
