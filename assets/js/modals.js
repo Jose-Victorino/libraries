@@ -1,11 +1,4 @@
 const bimPN = (() => {
-  const icons = {
-    check: './assets/images/svg/circle-check.svg',
-    info: './assets/images/svg/circle-info.svg',
-    warning: './assets/images/svg/circle-exclamation.svg',
-    error: './assets/images/svg/circle-xmark.svg',
-    question: './assets/images/svg/circle-question.svg',
-  }
   /**
    * @typedef {'text' | 'number' | 'email' | 'option'} Type
    * @typedef {'check' | 'info' | 'warning' | 'error' | 'question'} Icon
@@ -31,6 +24,13 @@ const bimPN = (() => {
    * @property {HTMLButtonElement} confirm 
    * @property {HTMLButtonElement} cancel
    */
+  const icons = {
+    check: './assets/images/svg/circle-check.svg',
+    info: './assets/images/svg/circle-info.svg',
+    warning: './assets/images/svg/circle-exclamation.svg',
+    error: './assets/images/svg/circle-xmark.svg',
+    question: './assets/images/svg/circle-question.svg',
+  }
   const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
   /**
    * @param {ModalType} modalType
@@ -289,89 +289,95 @@ const bimPN = (() => {
     });
   };
   
-  class BimPushNotifications {
-    constructor(){}
-    /**
-     * @typedef {Object} ToastPN
-     * @property {string} text - The toast message.
-     * @property {Locations} [location] - The location of the toast on the screen (default: 'top-left').
-     * @property {boolean} [animate] - Enable toast animation (default: true).
-     * @property {number} [timer] - Duration (in milliseconds) before the toast disappears (default: 2000).
-     * 
-     * @param {ToastPN} data
-     */
-    toast(data){
-      data = setDefaultValues('toast', data);
-      validate(data, ['text']);
-      
-      const el = init(data);
-      setElements(el, data);
-    };
-    /**
-     * @typedef {Object} AlertPN
-     * @property {string} title - The title of the alert.
-     * @property {string} text - The alert message.
-     * @property {Icon} icon - The type of icon to display.
-     * @property {boolean} [animate] - Enable alert animation (default: true).
-     * @property {boolean} [autoClose] - Toggle auto close (default: true).
-     * @property {number} [timer] - Duration (in milliseconds) before the alert disappears (default: 2000).
-     * 
-     * @param {AlertPN} data
-     */
-    alert(data){
-      data = setDefaultValues('alert', data);
-      validate(data, ['text']);
-
-      const el = init(data);
-      setElements(el, data);
-      buttonEvents(el, data);
-    };
-    /**
-     * @typedef {Object} InputPN
-     * @property {string} title - The title of the input modal.
-     * @property {string} text - The input prompt message.
-     * @property {Icon} icon - The type of icon to display.
-     * @property {Type} type - The type of input field.
-     * @property {Array} options - List of options.
-     * @property {string} [placeholder] - Placeholder text for the input field.
-     * @property {Array<string>} options - Options for a select input (if applicable).
-     * 
-     * @param {InputPN} data
-     * @returns {Promise<Results>}
-     */
-    input(data){
-      data = setDefaultValues('input', data);
-      
-      ['text', 'number', 'email'].includes(data.type) ? validate(data, ['text']) :
-      data.type === 'option' ? validate(data, ['text', 'options']) :
-      (() => {throw new Error(`Invalid input type: '${data.type}'.`)})();
-      
-      const el = init(data);
-      setElements(el, data);
-      
-      return buttonEvents(el, data, data.type);
-    };
-    /**
-     * @typedef {Object} ConfirmPN
-     * @property {string} title - The title of the confirmation modal.
-     * @property {string} text - The confirmation prompt message.
-     * @property {Icon} icon - The type of icon to display.
-     * @property {string} [confirmButtonText] - Text for the confirm button.
-     * @property {string} [cancelButtonText] - Text for the cancel button.
-     * 
-     * @param {ConfirmPN} data
-     * @returns {Promise<Results>}
-     */
-    confirm(data){
-      data = setDefaultValues('confirm', data);
-      validate(data, ['text']);
-
-      const el = init(data);
-      setElements(el, data);
-
-      return buttonEvents(el, data, 'confirm');
-    };
+  /**
+   * @typedef {Object} ToastPN
+   * @property {string} text - The toast message.
+   * @property {Locations} [location] - The location of the toast on the screen (default: 'top-left').
+   * @property {boolean} [animate] - Enable toast animation (default: true).
+   * @property {number} [timer] - Duration (in milliseconds) before the toast disappears (default: 2000).
+   * 
+   * @param {ToastPN} data
+   */
+  const toast = (data) => {
+    data = setDefaultValues('toast', data);
+    validate(data, ['text']);
+    
+    const el = init(data);
+    setElements(el, data);
   };
+  /**
+   * @typedef {Object} AlertPN
+   * @property {string} title - The title of the alert.
+   * @property {string} text - The alert message.
+   * @property {Icon} icon - The type of icon to display.
+   * @property {boolean} [animate] - Enable alert animation (default: true).
+   * @property {boolean} [autoClose] - Toggle auto close (default: true).
+   * @property {number} [timer] - Duration (in milliseconds) before the alert disappears (default: 2000).
+   * 
+   * @param {AlertPN} data
+   */
+  const alert = (data) => {
+    data = setDefaultValues('alert', data);
+    validate(data, ['text']);
+
+    const el = init(data);
+    setElements(el, data);
+    buttonEvents(el, data);
+  };
+  /**
+   * @typedef {Object} InputPN
+   * @property {string} title - The title of the input modal.
+   * @property {string} text - The input prompt message.
+   * @property {Icon} icon - The type of icon to display.
+   * @property {Type} type - The type of input field.
+   * @property {Array} options - List of options.
+   * @property {string} [placeholder] - Placeholder text for the input field.
+   * @property {Array<string>} options - Options for a select input (if applicable).
+   * 
+   * @param {InputPN} data
+   * @returns {Promise<Results>}
+   */
+  const input = (data) => {
+    data = setDefaultValues('input', data);
+    
+    ['text', 'number', 'email'].includes(data.type) ? validate(data, ['text']) :
+    data.type === 'option' ? validate(data, ['text', 'options']) :
+    (() => {throw new Error(`Invalid input type: '${data.type}'.`)})();
+    
+    const el = init(data);
+    setElements(el, data);
+    
+    return buttonEvents(el, data, data.type);
+  };
+  /**
+   * @typedef {Object} ConfirmPN
+   * @property {string} title - The title of the confirmation modal.
+   * @property {string} text - The confirmation prompt message.
+   * @property {Icon} icon - The type of icon to display.
+   * @property {string} [confirmButtonText] - Text for the confirm button.
+   * @property {string} [cancelButtonText] - Text for the cancel button.
+   * 
+   * @param {ConfirmPN} data
+   * @returns {Promise<Results>}
+   */
+  const confirm = (data) => {
+    data = setDefaultValues('confirm', data);
+    validate(data, ['text']);
+
+    const el = init(data);
+    setElements(el, data);
+
+    return buttonEvents(el, data, 'confirm');
+  };
+
+  class BimPushNotifications{
+    constructor(){}
+  };
+
+  BimPushNotifications.prototype.toast = toast;
+  BimPushNotifications.prototype.alert = alert;
+  BimPushNotifications.prototype.input = input;
+  BimPushNotifications.prototype.confirm = confirm;
 
   return new BimPushNotifications();
 })();
