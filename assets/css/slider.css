@@ -34,6 +34,11 @@
   height: 12px;
   border-radius: 50%;
 }
+.bimSlider [data-pagination-ul=line] button{
+  height: 8px;
+  width: 20px;
+  border-radius: 2px;
+}
 .bimSlider [data-pagination-ul=numbers] button{
   font-size: 12px;
   font-weight: 600;

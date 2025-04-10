@@ -54,24 +54,21 @@ const BimSlider = (function (){
   const validation = () => {
     if(!(parent instanceof HTMLElement || parent instanceof Element))
       throw new TypeError(`Invalid data format '${parent}'. Parent must be a HTMLElement`);
-    
-    switch(sData.type){
-      case 'auto-scroll':
-        Object.assign(sData, {
-          draggable: false,
-          arrows: false,
-          scrollable: false,
-          pagination: false,
-        });
-      break;
-    }
 
-    function validate(option, validType, validator = null){
+    const validate = (option, validType, validator = null) => {
       if(!(typeof option === validType && (validator ? validator(option) : true)))
         throw new TypeError(`Invalid value for option: ${option}`);
     }
 
     validate(sData.type, 'string', val => ['normal', 'loop', 'auto-scroll'].includes(val));
+    if(sData.type === 'auto-scroll'){
+      Object.assign(sData, {
+        draggable: false,
+        arrows: false,
+        scrollable: false,
+        pagination: false,
+      });
+    }
     validate(sData.spanWidth, 'boolean');
     validate(sData.arrows, 'boolean');
     validate(sData.arrowType, 'string', val => ['chevron', 'angle', 'caret', 'circled', 'arrow thin', 'arrow solid'].includes(val));
@@ -244,7 +241,7 @@ const BimSlider = (function (){
     }
   };
   const updateSliderConfig = () => {
-    translateValues = Array.from(parent.children).map((_, i) => i * (cards[0].getBoundingClientRect().width + gap));
+    translateValues = Array.from(parent.children).map((c, i) => i * (c.getBoundingClientRect().width + gap));
     parent.style.transform = `translateX(-${translateValues[activeIndex]}px)`;
     
     if(sData.type === 'auto-scroll') return;
@@ -289,12 +286,12 @@ const BimSlider = (function (){
       const maxIndex = maxCards + endCard - 1;
       
       if(activeIndex === maxIndex + sData.perMove){
-        doAnimate = await snapTransition(t, maxCards * 2);
         activeIndex = maxCards;
+        doAnimate = await snapTransition(t, maxCards * 2);
       }
       else if(activeIndex === maxCards - sData.perMove){
-        doAnimate = await snapTransition(t, maxCards - sData.perPage);
         activeIndex = maxCards * 2 - sData.perPage;
+        doAnimate = await snapTransition(t, maxCards - sData.perPage);
       }
       if(activeIndex > maxIndex){
         activeIndex = maxIndex;
@@ -305,8 +302,8 @@ const BimSlider = (function (){
     }
     else if(sData.type === 'auto-scroll'){
       if(activeIndex === maxCards * 2){
-        doAnimate = await snapTransition(t, activeIndex);
         activeIndex = maxCards;
+        doAnimate = await snapTransition(t, maxCards * 2);
       }
     }
     parent.style.transform = `translateX(-${translateValues[activeIndex]}px)`;
@@ -447,9 +444,21 @@ const BimSlider = (function (){
   class slider{
     /**
      * @param {HTMLElement} cardList
-     * @param {Data} d
+     * @param {Data} data
      */
-    constructor(cardList, {type = 'normal', spanWidth = false, arrows = false, arrowType = 'chevron', draggable = false, scrollable = false, pagination = false, perPage = 3, perMove = 1, interval = 3000}){
+    constructor(cardList, data){
+      const {
+        type = 'normal',
+        spanWidth = false,
+        arrows = false,
+        arrowType = 'chevron',
+        draggable = false,
+        scrollable = false,
+        pagination = false,
+        perPage = 3,
+        perMove = 1,
+        interval = 3000,
+      } = data;
       parent = cardList;
       cards = cardList.children;      
       maxCards = cardList.children.length;

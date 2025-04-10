@@ -62,14 +62,15 @@ new BimSlider(sliderUl, {
   type: 'auto-scroll',
   type: 'loop',
   arrows: true,
-  perPage: 3,
-  perMove: 2,
   // spanWidth: true,
   draggable: true,
   scrollable: true,
   pagination: 'line',
   pagination: 'dots',
   pagination: 'numbers',
+  perPage: 3,
+  perMove: 2,
+  interval: 2000,
 });
 
 const bc = document.getElementById('breadcrumbs-list');
