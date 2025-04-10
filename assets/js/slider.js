@@ -226,7 +226,7 @@ const BimSlider = (function (){
     endCard = maxCards - (sData.perPage - 1);
     
     let startVisibleCard = activeIndex;
-    let endVisibleCard = activeIndex + sData.perMove - 1;
+    let endVisibleCard = activeIndex + sData.perPage - 1;
 
     for(let i = 0; i < cards.length; i++){
       if(i >= startVisibleCard && i <= endVisibleCard){
@@ -339,7 +339,14 @@ const BimSlider = (function (){
     
     for(let i = 0; i < pages.length; i++){
       const btn = pages[i].querySelector('button');
-      btn.dataset.currentPage = i === selectedBtn ? 'true' : 'false';
+      if(i === selectedBtn){
+        btn.dataset.currentPage = 'true';
+        btn.ariaSelected = 'true';
+      }
+      else{
+        btn.dataset.currentPage = 'false';
+        btn.ariaSelected = 'false';
+      }
     }
   };
   const updateElements = (t) => {
